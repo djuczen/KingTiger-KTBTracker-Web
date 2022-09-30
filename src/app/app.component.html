@@ -1,0 +1,18 @@
+<section id="main-header">
+  <app-header></app-header>
+</section>
+<section class="container-fluid" id="main-content">
+  <div class="row">
+    <div class="col-sm-1 col-md-2 p-0">
+      <app-sidebar></app-sidebar>
+    </div>
+    <div class="col">
+      <main role="main">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+</section>
+<section id="main-footer">
+  <app-footer></app-footer>
+</section>

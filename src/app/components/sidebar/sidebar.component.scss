@@ -1,0 +1,17 @@
+
+.sidebar {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: #ccc;
+}
+
+.sidebar-icons {
+    max-width: 4rem;
+    overflow: hidden;
+}
+
+.sidebar-full {
+    max-width: 20rem;
+    overflow: auto;
+}
