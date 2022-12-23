@@ -1,5 +1,9 @@
+import { NgxLoggerLevel } from "ngx-logger";
+
 export const environment = {
   production: true,
+  logLevel: NgxLoggerLevel.OFF,
+  serverLogLevel: NgxLoggerLevel.ERROR,
   firebase: {
     apiKey: "AIzaSyDJvlg2IvnLKte4uhA-PicN5Eibr6cdDPE",
     authDomain: "ktbtracker-1659484356633.firebaseapp.com",

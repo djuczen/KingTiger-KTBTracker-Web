@@ -1,0 +1,44 @@
+<form [formGroup]="requirementsForm">
+  <div class="row mb-3" *ngFor="let field of controlsMap | keyvalue">
+    <label [for]="field.key" class="col-form-label">{{
+      requirementTitle(field.key)
+    }}</label>
+    <div class="input-group mb-3">
+      <button
+        class="btn btn-outline-primary"
+        type="button"
+        id="{{ field.key }}__minus"
+        [disabled]="isMin(field.key)"
+        (click)="decrement(field.key)"
+      >
+        <i class="bi-dash"></i>
+      </button>
+      <input
+        type="number"
+        class="form-control"
+        id="{{ field }}"
+        [formControlName]="field.key"
+        placeholder="0"
+        (change)="onInputChange($event, field.key)"
+      />
+      <button
+        class="btn btn-outline-primary"
+        type="button"
+        id="{{ field.key }}__plus"
+        [disabled]="isMax(field.key)"
+        (click)="increment(field.key)"
+      >
+        <i class="bi-plus"></i>
+      </button>
+      <input
+        type="range"
+        class="form-range"
+        id="{{ field.key }}__range"
+        min="0"
+        max="{{ field.value }}"
+        (change)="onRangeChange($event, field.key)"
+        [title]="field.value"
+      />
+    </div>
+  </div>
+</form>

@@ -2,8 +2,12 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { NgxLoggerLevel } from "ngx-logger";
+
 export const environment = {
   production: false,
+  logLevel: NgxLoggerLevel.DEBUG,
+  serverLogLevel: NgxLoggerLevel.OFF,
   firebase: {
     apiKey: "AIzaSyDJvlg2IvnLKte4uhA-PicN5Eibr6cdDPE",
     authDomain: "ktbtracker-1659484356633.firebaseapp.com",
@@ -12,6 +16,9 @@ export const environment = {
     messagingSenderId: "605352235793",
     appId: "1:605352235793:web:42346a08b24cd3786b72b0",
     measurementId: "G-QB3J6TD92Y"
+  },
+  api: {
+    url: 'http://localhost:9080'
   }
 };
 

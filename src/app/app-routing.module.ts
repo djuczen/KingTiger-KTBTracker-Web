@@ -1,24 +1,19 @@
 import { NgModule } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot, RouterModule, RouterStateSnapshot, Routes } from '@angular/router';
-import { redirectUnauthorizedTo, redirectLoggedInTo, AngularFireAuthGuard } from '@angular/fire/compat/auth-guard';
+import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/compat/auth-guard';
 
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { SignInComponent } from './components/sign-in/sign-in.component';
-import { RegisterComponent } from './components/register/register.component';
-import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
-import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
-import { AuthGuard } from './shared/guard/auth.guard';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { SignInComponent } from './pages/sign-in/sign-in.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
+import { ActivityComponent } from './pages/activity/activity.component';
+import { ClassesComponent } from './pages/classes/classes.component';
 
 
-const redirectUnauthorizedToLogin = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-  console.log('redirectUnauthorizedToLogin...', next, state, `${state.url}`);
-  return redirectUnauthorizedTo(`/sign-in?returnUrl=${state.url}`);
-};
+const adminOnly = () => hasCustomClaim('admin');
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['sign-in']);
 
-const redirectAuthorizedToNext = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-  console.log('redirectAuthorizedToNext...', next.queryParams['returnUrl'] || '/');
-  return redirectLoggedInTo([next.queryParams['returnUrl'] || '/']);
-};
 
 const routes: Routes = [
   {
@@ -29,10 +24,7 @@ const routes: Routes = [
   { 
     path: 'sign-in',
     component: SignInComponent,
-    canActivate: [AngularFireAuthGuard],
-    data: {
-      authGuardPipe: redirectAuthorizedToNext
-    }
+
   },
   {
     path: 'register',
@@ -47,12 +39,20 @@ const routes: Routes = [
     component: VerifyEmailComponent
   },
   {
+    path: 'activity',
+    component: ActivityComponent,
+    canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
+  {
+    path: 'classes',
+    component: ClassesComponent,
+    canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
+  {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AngularFireAuthGuard], 
-    data: { 
-      authGuardPipe: redirectUnauthorizedToLogin
-    } 
+    canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }
+
   },
 ];
 

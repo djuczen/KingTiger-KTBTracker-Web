@@ -1,0 +1,116 @@
+<div class="side-bar" [ngClass]="shrinkClass">
+  <div class="logo-name-wrapper">
+    <div class="logo-name">
+      <img src="" class="logo" alt="logo app" srcset="" />
+      <span class="logo-name__name"></span>
+    </div>
+    <button class="logo-name__button">
+      <i
+        class="logo-name__icon"
+        [ngClass]="shrinkIconClass"
+        (click)="toggleSidebar()"
+        id="logo-name__icon"
+      ></i>
+    </button>
+  </div>
+  <div class="message">
+    <i class="message-icon bi-pencil-square"></i>
+    <span class="message-text">New Mesage</span>
+    <span class="tooltip">New Mesage</span>
+  </div>
+  <ul class="features-list">
+    <li class="features-item inbox active">
+      <i class="bi-inbox features-item-icon inbox-icon"
+        ><span class="status"></span
+      ></i>
+      <span class="features-item-text">Inbox</span>
+      <span class="inbox-number">99</span>
+      <span class="tooltip">Inbox</span>
+    </li>
+    <li class="features-item draft">
+      <i class="bi-file-earmark features-item-icon"></i>
+      <span class="features-item-text">Draft</span>
+      <span class="tooltip">Draft</span>
+    </li>
+    <li class="features-item star">
+      <i class="bi-star features-item-icon"></i>
+      <span class="features-item-text">Starred</span>
+      <span class="tooltip">Starred</span>
+    </li>
+    <li class="features-item sent">
+      <i class="bi-send features-item-icon"></i>
+      <span class="features-item-text">Sent</span>
+      <span class="tooltip">Sent</span>
+    </li>
+    <li class="features-item trash">
+      <i class="bi-trash features-item-icon"></i>
+      <span class="features-item-text">Trash</span>
+      <span class="tooltip">Trash</span>
+    </li>
+    <li class="features-item spam">
+      <i class="bi-envelope-slash features-item-icon"></i>
+      <span class="features-item-text">Spam</span>
+      <span class="tooltip">Spam</span>
+    </li>
+  </ul>
+  <ul class="category-list">
+    <div class="category-header">Message categories</div>
+    <li class="category-item">
+      <span
+        class="category-item-status"
+        style="background-color: #79d861"
+      ></span
+      ><span class="category-item-text">My works</span
+      ><span class="category-item-number">9</span>
+      <span class="tooltip">My works</span>
+    </li>
+    <li class="category-item">
+      <span
+        class="category-item-status"
+        style="background-color: #c43c5d"
+      ></span
+      ><span class="category-item-text">Accountant</span
+      ><span class="category-item-number">43</span>
+      <span class="tooltip">Accountant</span>
+    </li>
+    <li class="category-item">
+      <span
+        class="category-item-status"
+        style="background-color: #ff5050"
+      ></span
+      ><span class="category-item-text">Works</span
+      ><span class="category-item-number">78</span>
+      <span class="tooltip">Works</span>
+    </li>
+    <li class="category-item">
+      <span
+        class="category-item-status"
+        style="background-color: #42ffdd"
+      ></span
+      ><span class="category-item-text">Marketing</span
+      ><span class="category-item-number">253</span>
+      <span class="tooltip">Marketing</span>
+    </li>
+  </ul>
+  <ul class="chat-list">
+    <div class="chat-header">recent chats</div>
+    <button class="chat-new-btn">
+      <i class="bi-plus-circle chat-icon"></i>
+      <span class="chat-new-btn-text">Start New Chat</span>
+      <span class="tooltip">New Chat</span>
+    </button>
+    <li class="chat-item">
+      <span class="chat-item-avatar-wrapper has-message"> </span>
+      <span class="chat-item-name">Steve Rogers</span>
+      <span class="chat-item-number">53</span>
+    </li>
+    <li class="chat-item">
+      <span class="chat-item-avatar-wrapper"> </span>
+      <span class="chat-item-name">Tony Stark</span
+      ><span class="chat-item-status" style="background-color: #79d861"></span>
+    </li>
+  </ul>
+</div>
+<ng-template #noSidebar>
+  <div style="display: none"></div>
+</ng-template>

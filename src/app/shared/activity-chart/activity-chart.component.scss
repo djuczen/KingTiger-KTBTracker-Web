@@ -1,0 +1,53 @@
+
+@keyframes spin {
+    to { transform: rotate(.5turn); }
+}
+
+@keyframes bg {
+    50% { background: #655; }
+}
+
+.pie {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #777;
+    background-image: linear-gradient(to right, transparent, 50%, #655 0);
+    color: transparent;
+    text-align: center;
+
+    ::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100%;
+        border-radius: 0 100% 100% 0 / 50%;
+        background-color: inherit;
+        transform-origin: left;
+        animation: spin 50s linear infinite, bg 100s step-end infinite;
+        animation-play-state: paused;
+        animation-delay: inherit;
+    }
+}
+
+@keyframes fillup {
+    to { stroke-dasharray: 158 158 ;}
+}
+
+svg {
+    width: 100px; height: 100px;
+    transform: rotate(-90deg);
+    background: #aaa;
+    border-radius: 50%;
+}
+
+circle {
+    fill: #aaa;
+    stroke: #aaa;
+    stroke-width: 32;
+    animation: fillup 5s linear ease-in-out;
+}
+

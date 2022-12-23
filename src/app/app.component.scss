@@ -1,4 +1,4 @@
-
+/*
 section#main-header {
     min-height: 75px;
 }
@@ -17,4 +17,13 @@ section {
 
 #sidebar-container {
     background-color: aqua;
+}
+*/
+
+section#main-content {
+    overflow: auto;
+}
+
+section#sidebar {
+    min-width: 0;
 }

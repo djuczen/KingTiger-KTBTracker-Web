@@ -1,0 +1,87 @@
+<div class="container text-center">
+  <div class="row align-items-center vh-100">
+    <div class="col-md-5 mx-auto align-self-center">
+      <div id="signin-top">
+        <div class="signin-form form">
+          <div class="logo mb-3">
+            <div class="col-md-12 text-center">
+              <h1>Sign in</h1>
+            </div>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              id="signin-email"
+              aria-describedby="email-help"
+              placeholder="Enter Email"
+              #email
+              required
+            />
+            <label for="signin-email">Email Address</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="password"
+              name="password"
+              class="form-control"
+              id="signin-password"
+              aria-describedby="password-help"
+              placeholder="Enter Password"
+              #password
+              required
+            />
+            <label for="signin-password">Password</label>
+          </div>
+          <div class="form-group">
+            <p class="text-center">
+              By signing up you accept our
+              <a href="javascript:void();">Terms Of Use</a>
+            </p>
+          </div>
+          <div class="col-md-12 text-center">
+            <button
+              class="btn btn-block btn-primary"
+              (click)="handleEmailSignIn(email.value, password.value)"
+            >
+              Login
+            </button>
+          </div>
+          <div class="col-md-12">
+            <div class="signin-or">
+              <hr class="hr-or" />
+              <span class="span-or">or</span>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <p class="text-center">Sign in with</p>
+          </div>
+          <div class="col-md-12 mb-3">
+            <div class="d-grid gap-2 d-md-block text-center">
+              <button
+                class="btn btn-outline-primary mz-2"
+                (click)="handleAppleSignIn()"
+              >
+                <i class="bi-apple"></i>
+                Apple
+              </button>
+              <button
+                class="btn btn-outline-primary mx-2"
+                (click)="handleGoogleSignIn()"
+              >
+                <i class="bi-google"></i>
+                Google
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <p class="text-center">
+              Don't have account? <a href="#" id="signup">Sign up here</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+
+.progress  {
+    position: relative;
+}
+
+.line {
+    border-left: 3px solid var(--bs-dark);
+    height: 100%;
+    position: absolute;
+    left: 0%;
+   // z-index: 2000;
+}

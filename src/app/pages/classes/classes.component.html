@@ -1,0 +1,225 @@
+<div class="container-fluid px-0">
+    <div class="container" *ngIf="currentCycle">
+        <div class="row px-3">
+            <div class="col text-center">
+                <h1 class="text-center">
+                    <app-activity-chart size="2.25rem" [percent]="cycleProgress()">
+                    </app-activity-chart>
+                    {{ currentCycle.title }}
+                </h1>
+                <h4> {{ currentCycle.cycleStart | localDate:'fullDate' }} &mdash; {{ currentCycle.cycleEnd |
+                    localDate:'fullDate' }}
+                </h4>
+                <p>{{ cycleDays }} {{ cycleDay }} {{ cycleWeeks }} {{ currentWeek }} {{ currentDate }}</p>
+            </div>
+        </div>
+        <div class="row container">
+            <form class="needs-validation" novalidate [formGroup]="requirementsForm" (ngSubmit)="onSubmit()">
+                <table class="table table-borderless">
+                    <caption class="caption-top">{{ currentUser?.displayName || '-?-' }}</caption>
+                    <thead>
+                        <tr class="table-dark">
+                            <th>
+                                <div class="d-flex">
+                                    <div>
+                                        <button type="button" class="btn btn-rounded border-0"
+                                            [disabled]="(currentWeek + 1) <= 1">
+                                            <a [routerLink]="currentRoute" [queryParams]="{week: (currentWeek + 1) - 1}"
+                                                queryParamsHandling="merge">
+                                                <i class="text-white fs-2 bi bi-arrow-left-circle-fill"></i>
+                                            </a>
+                                        </button>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h2 class="text-center">
+                                            <app-activity-chart size="2rem" [percent]="weekProgress()">
+                                            </app-activity-chart>
+                                            Week {{ currentWeek + 1 }}
+                                        </h2>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-rounded border-0"
+                                            [disabled]="(currentWeek + 1) >= cycleWeeks">
+                                            <a [routerLink]="currentRoute" [queryParams]="{week: (currentWeek + 1) + 1}"
+                                                queryParamsHandling="merge">
+                                                <i class="text-white fs-2 bi bi-arrow-right-circle-fill"></i>
+                                            </a>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="table-dark">
+                            <th class="text-center">
+                                {{ weekStarts | localDate:'fullDate' }} &mdash; {{ weekEnds | localDate:'fullDate' }}
+                            </th>
+                        </tr>
+                        <tr class="table-dark">
+                            <th class="text-center">
+                                <button type="button" class="btn btn-link" *ngFor="let w of range(cycleWeeks)">
+                                    <a [routerLink]="currentRoute" [queryParams]="{week: w + 1}"
+                                        queryParamsHandling="merge">
+                                        <i class="bi bi-circle-fill"
+                                            [ngStyle]="{color: weekColor(w), opacity: w === currentWeek ? '1.0' : '0.5'}"></i>
+                                    </a>
+                                </button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="container px-0 py-3">
+                                    <!-- WEEKLY SET A -->
+                                    <div class="row">
+                                        <div class="col px-1">
+                                            <table class="table table-hover">
+                                                <caption class="caption-top">Class Attendance</caption>
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>Day</th>
+                                                        <th>
+                                                            <app-activity-chart size="1.5rem"
+                                                                [percent]="weeklyProgress(weeklyA, 'classSaturday')">
+                                                            </app-activity-chart>
+                                                            {{ config('classSaturday')?.title }}
+                                                        </th>
+                                                        <th>
+                                                            <app-activity-chart size="1.5rem"
+                                                                [percent]="weeklyProgress(weeklyA, 'classWeekday')">
+                                                            </app-activity-chart>
+                                                            {{ config('classWeekday')?.title }}
+                                                        </th>
+                                                        <th>
+                                                            <app-activity-chart size="1.5rem"
+                                                                [percent]="weeklyProgress(weeklyA, 'classPMAA')">
+                                                            </app-activity-chart>
+                                                            {{ config('classPMAA')?.title }}
+                                                        </th>
+                                                        <th>
+                                                            <app-activity-chart size="1.5rem"
+                                                                [percent]="weeklyProgress(weeklyA, 'classSparring')">
+                                                            </app-activity-chart>
+                                                            {{ config('classSparring')?.title }}
+                                                        </th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ng-container formArrayName="weeklyA">
+                                                        <ng-container
+                                                            *ngFor="let weeklyAForm of weeklyA.controls; let i = index">
+                                                            <tr [ngClass]="weekDate(i).equals(currentDate) ? 'table-active' : ''"
+                                                                [formGroupName]="i">
+                                                                <td>{{ weekDate(i) | localDate:'cccc' |
+                                                                    uppercase }}<br /><small>{{
+                                                                        weekDate(i) }}</small>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-check" *ngIf="weekDay(i) === 6">
+                                                                        <input type="checkbox" class="form-check-input"
+                                                                            id="classSaturday{{ i }}"
+                                                                            [ngClass]="weeklyAForm.get('classSaturday')?.errors ? 'is-invalid' : ''"
+                                                                            formControlName="classSaturday" />
+                                                                        <div class="invalid-feedback">
+                                                                            Enter {{ config('classSaturday')?.units }}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-check" *ngIf="weekDay(i) !== 7">
+                                                                        <input type="checkbox" class="form-check-input"
+                                                                            id="classWeekday{{ i }}"
+                                                                            [ngClass]="weeklyAForm.get('classWeekday')?.errors ? 'is-invalid' : ''"
+                                                                            formControlName="classWeekday" />
+                                                                        <div class="invalid-feedback">
+                                                                            Enter {{ config('classWeekday')?.units }}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-check" *ngIf="weekDay(i) !== 7">
+                                                                        <input type="checkbox" class="form-check-input"
+                                                                            id="classPMAA{{ i }}"
+                                                                            [ngClass]="weeklyAForm.get('classPMAA')?.errors ? 'is-invalid' : ''"
+                                                                            formControlName="classPMAA" />
+                                                                        <div class="invalid-feedback">
+                                                                            Enter {{ config('classPMAA')?.units }}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-check" *ngIf="weekDay(i) !== 7">
+                                                                        <input type="checkbox" class="form-check-input"
+                                                                            id="classSparring{{ i }}"
+                                                                            [ngClass]="weeklyAForm.get('classSparring')?.errors ? 'is-invalid' : ''"
+                                                                            formControlName="classSparring" />
+                                                                        <div class="invalid-feedback">
+                                                                            Enter {{ config('classSparring')?.units }}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div *ngIf="isEditable(weeklyAForm)"
+                                                                        [title]="canEditTitle(weeklyAForm)">
+                                                                        <button type="button" class="btn btn-link"
+                                                                            (click)="edit(weeklyAForm, i)"
+                                                                            [disabled]="!canEdit(weeklyAForm)">
+                                                                            <i
+                                                                                class="bi bi-{{ canEdit(weeklyAForm) ? 'pencil' : 'lock' }}"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div *ngIf="!isEditable(weeklyAForm)">
+                                                                        <button type="submit" class="btn btn-link"
+                                                                            (click)="save(weeklyAForm, i)">
+                                                                            <i class="bi bi-check-lg"></i>
+                                                                        </button>
+                                                                        <button type="reset" class="btn btn-link"
+                                                                            (click)="cancel(weeklyAForm, i)">
+                                                                            <i class="bi bi-x-lg"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td class="text-center text-muted">
+                                                            ({{ weeklyGoal("classSaturday") | rounded:'ceil' }} classes
+                                                            total)
+                                                        </td>
+                                                        <td class="text-center text-muted">
+                                                            ({{ weeklyGoal("classWeekday") | rounded:'ceil' }} classes
+                                                            total)
+                                                        </td>
+                                                        <td class="text-center text-muted">
+                                                            ({{ weeklyGoal("classPMAA") | rounded:'ceil' }} classes
+                                                            total)
+                                                        </td>
+                                                        <td class="text-center text-muted">
+                                                            ({{ weeklyGoal("classSparring") | rounded:'ceil' }} classes
+                                                            total)
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="container" *ngIf="!currentCycle">
+        <div class="row">
+            <h2 class="text-center">No Active Cycle</h2>
+        </div>
+    </div>
+</div>

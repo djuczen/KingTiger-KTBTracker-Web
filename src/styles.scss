@@ -1,5 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
+@font-face {
+    font-family: "MagistralBold";
+    src: url('assets/Magistral_Bold.woff2') format('woff2'), 
+        url('assets/Magistral_Bold.woff') format('woff');
+}
+
 html, body {
     height: 100%;
     height: 100vh;
@@ -8,16 +14,54 @@ html, body {
     margin: 0;
 }
 
-app-root {
-    min-height: 100%;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-align: stretch;
-    -ms-flex-align: stretch;
-    align-items: stretch;
+body { 
+    margin: 0; 
+    font-family: "Helvetica Neue", Roboto, sans-serif; 
 }
+
+app-root {
+    height: 100vh;
+
+    display: grid;
+    grid-template-areas: "main-header" "main-content" "main-footer";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+}
+
+app-root > section#main-header {
+    grid-area: main-header;
+}
+
+app-root > section#main-content {
+    grid-area: main-content;
+}
+
+app-root > section#main-footer {
+    grid-area: main-footer;
+}
+
+section#main-content {
+    display: grid;
+    grid-template-areas: "sidebar content";
+    grid-template-rows: 1fr;
+    grid-template-columns: fit-content(23.2rem) 1fr;
+}
+
+.font-magistral-bold {
+    font-family: MagistralBold, "Helvetica Neue", Roboto, san-serif;
+}
+
+/* Chrome, Safari, Edge, Opera */
+/*
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+*/
+/* Firefox */
+/*
+input[type=number] {
+    -moz-appearance: textfield;
+}
+*/
