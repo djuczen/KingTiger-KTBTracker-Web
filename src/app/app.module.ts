@@ -31,6 +31,8 @@ import { LocalDatePipe } from '@core/pipes/local-date.pipe';
 import { CycleWeekHeaderComponent } from './shared/cycle-week-header/cycle-week-header.component';
 import { RoundedPipe } from '@core/pipes/rounded.pipe';
 import { ClassesComponent } from './pages/classes/classes.component';
+import { CandidatesComponent } from './pages/candidates/candidates.component';
+import { UsersComponent } from './pages/users/users.component';
 
 
 
@@ -53,7 +55,9 @@ import { ClassesComponent } from './pages/classes/classes.component';
     LocalDatePipe,
     CycleWeekHeaderComponent,
     RoundedPipe,
-    ClassesComponent
+    ClassesComponent,
+    CandidatesComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,
