@@ -33,6 +33,7 @@ import { RoundedPipe } from '@core/pipes/rounded.pipe';
 import { ClassesComponent } from './pages/classes/classes.component';
 import { CandidatesComponent } from './pages/candidates/candidates.component';
 import { UsersComponent } from './pages/users/users.component';
+import { CyclesComponent } from './pages/cycles/cycles.component';
 
 
 
@@ -57,7 +58,8 @@ import { UsersComponent } from './pages/users/users.component';
     RoundedPipe,
     ClassesComponent,
     CandidatesComponent,
-    UsersComponent
+    UsersComponent,
+    CyclesComponent
   ],
   imports: [
     BrowserModule,
