@@ -4,6 +4,7 @@ import { Cycle } from '../interfaces/cycle';
 import { map, Observable } from 'rxjs';
 
 import { environment } from '@environment/environment';
+import { NGXLogger } from 'ngx-logger';
 
 
 @Injectable({
@@ -13,6 +14,7 @@ export class CyclesService {
   currentUser: any;
 
   constructor(
+    private logger: NGXLogger,
     private http: HttpClient
   ) {
 
@@ -31,8 +33,9 @@ export class CyclesService {
     return this.http.get<Cycle[]>(`${environment.api.url}/api/cycles`);
   }
 
-  getCycle(id: number | string): Observable<Cycle> {
-    return this.http.get<Cycle>(`${environment.api.url}/api/cycles/${id}`);
+  public getCycle(cycleId?: number | string): Observable<Cycle> {
+    this.logger.debug('getCycle(...)', cycleId);
+    return this.http.get<Cycle>(`${environment.api.url}/api/cycles/${cycleId || 'current'}`);
   }
 
   getCurrentCycle(): Observable<Cycle> {

@@ -1,1 +1,43 @@
-<p>cycles works!</p>
+<div class="container-fluid px-0">
+    <div class="container" *ngIf="cyclesList">
+        <div class="row px-3">
+            <div class="col text-center">
+                <h1 class="text-center font-magistral-bold">CYCLES</h1>
+            </div>
+        </div>
+        <div class="row container">
+            <form class="needs-validation" novalidate [formGroup]="cyclesForm">
+                <table class="table">
+                    <thead>
+                        <tr class="table-dark">
+                            <th>Cycle</th>
+                            <th>Starts</th>
+                            <th>Ends</th>
+                            <th>Weeks</th>
+                            <th>Days</th>
+                            <th><i class="bi bi-plus-circle"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container formArrayName="cycles">
+                            <ng-container *ngFor="let cycleForm of cycles.controls; let i = index">
+                                <tr [formGroupName]="i">
+                                    <td>{{ cyclesList[i].title }}</td>
+                                    <td>{{ cyclesList[i].cycleStart }}</td>
+                                    <td>{{ cyclesList[i].cycleEnd }}</td>
+                                    <td>{{ cycleWeeks(cyclesList[i]) }}</td>
+                                    <td>{{ cycleDays(cyclesList[i]) }}</td>
+                                    <td><button (click)="openEditor(cyclesList[i])"><i
+                                                class="bi bi-pencil"></i></button></td>
+                                </tr>
+                            </ng-container>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<ng-template #cycleEditor let-modal let-cycle>
+    <app-cycle-editor></app-cycle-editor>
+</ng-template>

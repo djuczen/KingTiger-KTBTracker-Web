@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { ActivatedRoute, ActivatedRouteSnapshot, RouterModule, RouterStateSnapshot, Routes } from '@angular/router';
-import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/compat/auth-guard';
+import { RouterModule, Routes } from '@angular/router';
+import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo } from '@angular/fire/compat/auth-guard';
 
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SignInComponent } from './pages/sign-in/sign-in.component';
@@ -9,6 +9,9 @@ import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { ActivityComponent } from './pages/activity/activity.component';
 import { ClassesComponent } from './pages/classes/classes.component';
+import { CandidatesComponent } from './pages/candidates/candidates.component';
+import { CyclesComponent } from './pages/cycles/cycles.component';
+import { UsersComponent } from './pages/users/users.component';
 
 
 const adminOnly = () => hasCustomClaim('admin');
@@ -54,6 +57,22 @@ const routes: Routes = [
     canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }
 
   },
+  {
+    path: 'cycles',
+    component: CyclesComponent,
+    canActivate: [AngularFireAuthGuard], data: { authGuardPage: redirectUnauthorizedToLogin }
+  },
+  {
+    path: 'candidates',
+    component: CandidatesComponent,
+    canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
+  {
+    path: 'users',
+    component: UsersComponent,
+    canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }
+  },
+  
 ];
 
 @NgModule({

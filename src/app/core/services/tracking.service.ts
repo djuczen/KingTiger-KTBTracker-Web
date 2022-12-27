@@ -17,7 +17,7 @@ export class TrackingService {
   constructor(private http: HttpClient) { }
 
  
-  getCandidateTracking(candidate: Candidate | undefined, fromDate: LocalDate, toDate: LocalDate): Observable<CandidateTracking> {
+  getCandidateTracking(candidate: Candidate | null, fromDate: LocalDate, toDate: LocalDate): Observable<CandidateTracking> {
     if (!candidate) {
       console.warn(`[WARN] No cycle/candidate requested!`);
 
@@ -29,11 +29,11 @@ export class TrackingService {
     return this.http.get<CandidateTracking>(`/api/cycles/${candidate?.cycleId || 'current'}/candidates/${candidate?.id || 'me'}/tracking`, { params: params });
   }
 
-  updateCandidateTracking(candidate: Candidate | undefined, tracking: Tracking): Observable<Tracking> {
+  updateCandidateTracking(candidate: Candidate | null, tracking: Tracking): Observable<Tracking> {
     return this.http.put<Tracking>(`/api/cycles/${candidate?.cycleId || 'current'}/candidates/${candidate?.id || 'me'}/tracking/${tracking.trackingDate}`, tracking);
   }
 
-  getCandidateStatistics(candidate: Candidate | undefined, scope: string = 'all'): Observable<FullStatistics> {
+  getCandidateStatistics(candidate: Candidate | null, scope: string = 'all'): Observable<FullStatistics> {
     return this.http.get<FullStatistics>(`/api/cycles/${candidate?.cycleId || 'current'}/candidates/${candidate?.id || 'me'}/statistics/full?scope=${scope}`);
   }
 

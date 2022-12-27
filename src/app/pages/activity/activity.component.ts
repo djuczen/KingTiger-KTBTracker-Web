@@ -22,6 +22,7 @@ import { ActivatedRoute, ParamMap, Route, UrlSegment } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { Utils } from '@core/utils';
 import { FullStatistics } from '@core/interfaces/full-statistics';
+import { StorageService } from '@core/services/storage.service';
 
 
 
@@ -47,9 +48,9 @@ export class ActivityComponent implements OnInit {
   currentGroups: string[] | undefined = [];
 
 
-  currentCycle: Cycle | undefined;
+  currentCycle: Cycle | null = null;
+  currentCandidate: Candidate | null = null;
 
-  currentCandidate: Candidate | undefined;
   currentStatistics: FullStatistics | undefined;
 
   candidateTracking: CandidateTracking | undefined;
@@ -61,6 +62,7 @@ export class ActivityComponent implements OnInit {
     private logger: NGXLogger,
     private route: ActivatedRoute,
     private fb: FormBuilder,
+    private storageService: StorageService,
     private cyclesService: CyclesService,
     private candidatesService: CandidatesService,
     private trackingService: TrackingService,
@@ -83,7 +85,7 @@ export class ActivityComponent implements OnInit {
   }
 
   get currentDate(): LocalDate {
-    return LocalDate.now().minusWeeks(4);
+    return LocalDate.now(); //.minusWeeks(4);
   }
 
   /**
@@ -93,6 +95,7 @@ export class ActivityComponent implements OnInit {
    * to the current date is used.
    */
    get currentWeek(): number {
+    //this.logger.debug('currentWeek(...)', this.paramsMap?.get('week'), this.currentCycle, this.currentDate);
     if (this.paramsMap?.get('week') !== null) {
       return Math.min(Math.max(parseInt(this.paramsMap?.get('week') || '1') - 1, 0), this.cycleWeeks);
     } 
@@ -104,6 +107,7 @@ export class ActivityComponent implements OnInit {
   //
 
   get weekStarts(): LocalDate {
+    //this.logger.debug('weekStarts(...)', this.currentCycle, this.currentWeek, this.currentDate);
     if (this.currentCycle) {
       return this.currentCycle?.cycleStart.plusWeeks(this.currentWeek);
     }
@@ -194,10 +198,7 @@ export class ActivityComponent implements OnInit {
   }
 
   get cycleDays(): number {
-    if (this.currentCycle) {
-      return this.currentCycle?.cycleStart.until(this.currentCycle?.cycleEnd.plusDays(1), ChronoUnit.DAYS).valueOf();
-    }
-    return 0;
+      return this.currentCycle?.cycleStart.until(this.currentCycle?.cycleEnd.plusDays(1), ChronoUnit.DAYS).valueOf() || 0;
   }
 
   get cycleDay(): number {
@@ -309,58 +310,80 @@ export class ActivityComponent implements OnInit {
   // Data Access
   //
 
-  fetchCycle(cycleId?: number | string | undefined) {
-    this.logger.debug(`fetchCycle(...)`, cycleId);
-    const forCycle = cycleId !== undefined ? cycleId : this.paramsMap?.get('cycle') || 'current';
-    this.cyclesService.getCycle(forCycle)
-      .subscribe({
-        next: (cycle) => {
-          this.currentCycle = cycle;
+  /**
+   * 
+   * @param cycleId 
+   */
+  fetchCycle(cycleId?: number | string) {
+    this.logger.debug(`fetchCycle(...)`, cycleId, this.paramsMap?.get('cycle'), this.storageService.getItem<Cycle>('activeCycle'));
+    this.currentCycle = this.storageService.getItem<Cycle>('activeCycle');
+    const forCycle = cycleId || this.paramsMap?.get('cycle') || undefined;
 
-          if (this.inRole('admin')) {
-            this.fetchCandidates(cycle);
-          } else {
-            this.fetchCandidate();
-          }
-        }
-      });
+    this.logger.debug('fetchCycle...', this.currentCycle, forCycle, (forCycle ? 'true' : 'false'));
+    if (forCycle || this.currentCycle === null) {
+      // If we have never fetched a Cycle before, we want the "current" Cycle, or we need a different Cycle, fetch it now
+      if (this.currentCycle === null || forCycle === 'current' || (this.currentCycle !== null && (Utils.isInteger(forCycle) && this.currentCycle.id !== forCycle))) {
+        this.cyclesService.getCycle(forCycle)
+          .subscribe({
+            next: (cycle) => {
+              this.currentCycle = cycle;
+              this.storageService.setItem('activeCycle', cycle);
+  
+              if (this.inRole('xadmin')) {
+                this.fetchCandidates(cycle);
+              } else {
+                this.fetchCandidate();
+              }
+            }
+          });
+      }
+    }
   }
 
   /**
    * 
    */
-  fetchCandidate(candidateId?: number | string | undefined) {
-    this.logger.debug(`fetchCandidate(...)`, candidateId);
-    const forCandidate = candidateId !== undefined ? candidateId : this.paramsMap?.get('can_id') || 'me';
-    if (forCandidate === 'me') {
-      this.candidatesService.getCurrentCandidate(this.currentCycle)
-        .subscribe({
-          next: (candidate) => {
-            this.currentCandidate = candidate;
+  fetchCandidate(candidateId?: number | string) {
+    this.logger.debug(`fetchCandidate(...)`, candidateId, this.paramsMap?.get('can_id'), this.storageService.getItem<Candidate>('activeCandidate'));
+    this.currentCandidate = this.storageService.getItem<Candidate>('activeCandidate');
+    const forCandidate = candidateId || this.paramsMap?.get('can_id') || undefined;
 
-            // The candidate may have changed or is new, (re-)fetch the tracking data now
-            this.fetchCandidateTracking(this.currentCandidate, this.weekStarts, this.weekEnds);
-          }
-        })
-    } else {
-      this.candidatesService.getCandidate(forCandidate)
-        .subscribe({
-          next: (candidate) => {
-            this.currentCandidate = candidate;
-
-            // If the cycle hasn't already been fetched or has changed, fetch it now
-            if (this.currentCycle === undefined || this.currentCycle?.id !== candidate.cycleId) {
-              this.fetchCycle(candidate.cycleId);
-            }
-
-            // The candidate may have changed or is new, (re-)fetch the tracking data now
-            this.fetchCandidateTracking(this.currentCandidate, this.weekStarts, this.weekEnds);
-          }
-        });
+    if (forCandidate || this.currentCandidate === null) {
+      // If we have never fetched a Candidate before, we want the "me" Candidate, or we need a different Candidate, fetch it now
+      if (this.currentCandidate === null || forCandidate === 'me' || (this.currentCandidate !== null && (Utils.isInteger(forCandidate) && this.currentCandidate.id !== forCandidate))) {
+        
+        if (forCandidate === 'me' || (!forCandidate && this.currentCycle)) {
+          this.candidatesService.getCurrentCandidate(this.currentCycle)
+            .subscribe({
+              next: (candidate) => {
+                this.currentCandidate = candidate;
+                this.storageService.setItem('activeCandidate', candidate);
+  
+                // The candidate may have changed or is new, (re-)fetch the tracking data now
+                this.fetchCandidateTracking(this.currentCandidate, this.weekStarts, this.weekEnds);
+              }
+            })
+        } else {
+          this.candidatesService.getCandidate(forCandidate)
+            .subscribe({
+              next: (candidate) => {
+                this.currentCandidate = candidate;
+    
+                // If the cycle hasn't already been fetched or has changed, fetch it now
+                if (this.currentCycle === undefined || this.currentCycle?.id !== candidate.cycleId) {
+                  this.fetchCycle(candidate.cycleId);
+                }
+    
+                // The candidate may have changed or is new, (re-)fetch the tracking data now
+                this.fetchCandidateTracking(this.currentCandidate, this.weekStarts, this.weekEnds);
+              }
+            });
+        }
+      }
     }
   }
   
-  fetchCandidates(cycle: Cycle | undefined) {
+  fetchCandidates(cycle?: Cycle | null) {
     this.logger.debug(`fetchCandidates(...)`, cycle);
     this.candidatesService.getCandidates(cycle)
       .subscribe({
@@ -384,7 +407,7 @@ export class ActivityComponent implements OnInit {
       });
   }
 
-  fetchCandidateTracking(candidate: Candidate | undefined, startDate: LocalDate, endDate: LocalDate) {
+  fetchCandidateTracking(candidate: Candidate | null, startDate: LocalDate, endDate: LocalDate) {
     this.logger.debug(`fetchCandidateTracking(...)`, candidate, startDate, endDate);
     this.trackingService.getCandidateTracking(candidate, startDate, endDate)
       .subscribe({
@@ -405,7 +428,7 @@ export class ActivityComponent implements OnInit {
       });
   }
 
-  fetchCandidateStatistics(candidate: Candidate | undefined) {
+  fetchCandidateStatistics(candidate: Candidate | null) {
     this.trackingService.getCandidateStatistics(candidate, 'physical')
       .subscribe({
         next: (result) => {
@@ -414,7 +437,7 @@ export class ActivityComponent implements OnInit {
       });
   }
 
-  updateCandidateTracking(candidate: Candidate | undefined, tracking: Tracking) {
+  updateCandidateTracking(candidate: Candidate | null, tracking: Tracking) {
     this.trackingService.updateCandidateTracking(candidate, tracking)
       .subscribe({
         next: (result) => {

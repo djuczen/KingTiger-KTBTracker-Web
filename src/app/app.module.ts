@@ -20,7 +20,6 @@ import { HeaderComponent } from '@shared/header/header.component';
 import { FooterComponent } from '@shared/footer/footer.component';
 import { httpInterceptorProviders } from '@core/interceptors';
 import { CustomJsonParser, JsonParser } from '@core/interceptors/json.interceptor';
-import { SidebarComponent } from '@shared/sidebar/sidebar.component';
 import { ProgressMeterComponent } from '@shared/progress-meter/progress-meter.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivityChartComponent } from './shared/activity-chart/activity-chart.component';
@@ -34,6 +33,10 @@ import { ClassesComponent } from './pages/classes/classes.component';
 import { CandidatesComponent } from './pages/candidates/candidates.component';
 import { UsersComponent } from './pages/users/users.component';
 import { CyclesComponent } from './pages/cycles/cycles.component';
+import { EditButtonComponent } from './shared/edit-button/edit-button.component';
+import { CycleEditorComponent } from './pages/cycles/cycle-editor/cycle-editor.component';
+import { NgbDateAdapter, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbLocalDateAdapter } from '@features/ngb-local-date-adapter';
 
 
 
@@ -48,7 +51,6 @@ import { CyclesComponent } from './pages/cycles/cycles.component';
     VerifyEmailComponent,
     HeaderComponent,
     FooterComponent,
-    SidebarComponent,
     ProgressMeterComponent,
     ActivityChartComponent,
     ActivityComponent,
@@ -59,7 +61,9 @@ import { CyclesComponent } from './pages/cycles/cycles.component';
     ClassesComponent,
     CandidatesComponent,
     UsersComponent,
-    CyclesComponent
+    CyclesComponent,
+    EditButtonComponent,
+    CycleEditorComponent
   ],
   imports: [
     BrowserModule,
@@ -75,11 +79,13 @@ import { CyclesComponent } from './pages/cycles/cycles.component';
     }),
     // ...Firebase Modules...
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    NgbDatepickerModule
   ],
   providers: [
     httpInterceptorProviders,
     { provide: JsonParser, useClass: CustomJsonParser },
+    { provide: NgbDateAdapter, useClass: NgbLocalDateAdapter },
   ],
   bootstrap: [AppComponent]
 })

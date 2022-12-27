@@ -41,9 +41,9 @@ export class DashboardComponent implements OnInit {
   currentGroups: string[] | undefined = [];
 
 
-  currentCycle: Cycle | undefined;
+  currentCycle: Cycle | null = null;
+  currentCandidate: Candidate | null = null;
 
-  currentCandidate: Candidate | undefined;
   currentStatistics: FullStatistics | undefined;
 
   physicalStatistics: FullStatistics | undefined;
@@ -283,7 +283,7 @@ export class DashboardComponent implements OnInit {
   // Data Access
   //
 
-  fetchCycle(cycleId?: number | string | undefined) {
+  fetchCycle(cycleId?: number | string) {
     this.logger.debug(`fetchCycle(...)`, cycleId);
     const forCycle = cycleId !== undefined ? cycleId : this.paramsMap?.get('cycle') || 'current';
     this.cyclesService.getCycle(forCycle)
@@ -296,7 +296,7 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  fetchCandidate(candidateId?: number | string | undefined) {
+  fetchCandidate(candidateId?: number | string) {
     this.logger.debug(`fetchCandidate(...)`, candidateId);
     const forCandidate = candidateId !== undefined ? candidateId : this.paramsMap?.get('can_id') || 'me';
     if (forCandidate === 'me') {
@@ -327,7 +327,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  fetchCandidateTracking(candidate: Candidate | undefined, startDate: LocalDate, endDate: LocalDate) {
+  fetchCandidateTracking(candidate: Candidate | null, startDate: LocalDate, endDate: LocalDate) {
     this.logger.debug(`fetchCandidateTracking(...)`, candidate, startDate, endDate);
     this.trackingService.getCandidateTracking(candidate, startDate, endDate)
       .subscribe({
@@ -347,7 +347,7 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  fetchCandidateStatistics(candidate: Candidate | undefined) {
+  fetchCandidateStatistics(candidate: Candidate | null) {
     combineLatest([
       this.trackingService.getCandidateStatistics(candidate, 'all'), 
       this.trackingService.getCandidateStatistics(candidate, 'physical'), 
@@ -358,7 +358,7 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  updateCandidateTracking(candidate: Candidate | undefined, tracking: Tracking) {
+  updateCandidateTracking(candidate: Candidate | null, tracking: Tracking) {
     this.trackingService.updateCandidateTracking(candidate, tracking)
       .subscribe({
         next: (result) => {

@@ -49,4 +49,8 @@ export class Utils {
     }
     return goalFunction(controlName) > 0 ? (controlProgress / goalFunction(controlName)) * 100.0 : 0;
   }
+
+  public static isInteger(value?: string | number): boolean {
+    return value ? !Number.isNaN(parseInt(String(value))) : false;
+  }
 }

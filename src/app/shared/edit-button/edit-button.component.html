@@ -1,0 +1,13 @@
+<div *ngIf="isEditable()" [title]="canEditTitle()">
+    <button type="button" class="btn btn-link" (click)="edit(index)" [disabled]="!canEdit()">
+        <i class="bi bi-{{ canEdit() ? 'pencil' : 'lock' }}"></i>
+    </button>
+</div>
+<div *ngIf="!isEditable()">
+    <button type="button" class="btn btn-link" (click)="save(index)">
+        <i class="bi bi-check-lg"></i>
+    </button>
+    <button type="button" class="btn btn-link" (click)="cancel(index)">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>

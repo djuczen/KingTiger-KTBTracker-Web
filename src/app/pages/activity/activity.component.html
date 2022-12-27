@@ -10,7 +10,8 @@
         <h4> {{ currentCycle.cycleStart | localDate:'fullDate' }} &mdash; {{ currentCycle.cycleEnd |
           localDate:'fullDate' }}
         </h4>
-        <p>{{ cycleDays }} {{ cycleDay }} {{ cycleWeeks }} {{ currentWeek }} {{ currentDate }}</p>
+        <p>{{ cycleDays }} {{ cycleDay }} {{ cycleWeeks }} {{ currentWeek }} {{ currentDate }} {{ weekStarts }} {{
+          weekEnds }}</p>
       </div>
     </div>
     <div class="row container" *ngIf="!inRole('xadmin')">
@@ -107,8 +108,8 @@
                           <ng-container formArrayName="weeklyA">
                             <ng-container *ngFor="let weeklyAForm of weeklyA.controls; let i = index">
                               <tr [ngClass]="weekDate(i).equals(currentDate) ? 'table-active' : ''" [formGroupName]="i">
-                                <td>{{ formDate(weeklyAForm) | localDate:'cccc' | uppercase }}<br /><small>{{
-                                    formDate(weeklyAForm) }}</small>
+                                <td>{{ weekDate(i) | localDate:'cccc' | uppercase }}<br /><small>{{
+                                    weekDate(i) }}</small>
                                 </td>
                                 <td>
                                   <input type="mumber" class="form-control" id="miles{{ i }}"
@@ -222,8 +223,8 @@
                           <ng-container formArrayName="dailyA">
                             <ng-container *ngFor="let dailyAForm of dailyA.controls; let i = index">
                               <tr [ngClass]="weekDate(i).equals(currentDate) ? 'table-active' : ''" [formGroupName]="i">
-                                <td>{{ f(dailyAForm, 'date') | localDate:'cccc' | uppercase }}<br /><small>{{
-                                    f(dailyAForm, 'date') }}</small>
+                                <td>{{ weekDate(i) | localDate:'cccc' | uppercase }}<br /><small>{{
+                                    weekDate(i) }}</small>
                                 </td>
                                 <td>
                                   <input type="mumber" class="form-control" id="jumps{{ i }}" formControlName="jumps" />
@@ -300,8 +301,8 @@
                           <ng-container formArrayName="dailyB">
                             <ng-container *ngFor="let dailyBForm of dailyB.controls; let i = index">
                               <tr [ngClass]="weekDate(i).equals(currentDate) ? 'table-active' : ''" [formGroupName]="i">
-                                <td>{{ f(dailyBForm, 'date') | localDate:'cccc' | uppercase }}<br /><small>{{
-                                    f(dailyBForm, 'date') }}</small>
+                                <td>{{ weekDate(i) | localDate:'cccc' | uppercase }}<br /><small>{{
+                                    weekDate(i) }}</small>
                                 </td>
                                 <td>
                                   <input type="mumber" class="form-control" id="poomsae{{ i }}"

@@ -1,0 +1,173 @@
+<div class="modal-header">
+
+</div>
+<div class="modal-body">
+    <div class="container">
+        <form novalidate [formGroup]="editorForm" class="needs-validation">
+            <div class="row">
+                <div class="col">
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="title" formControlName="title" required />
+                            <label for="title">Title</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="alias" formControlName="alias"
+                                placeholder="Auto-generated..." />
+                            <label for="alias">Alias</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="cycleStart" class="form-label">Start Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="cycleStart" formControlName="cycleStart"
+                                required ngbDatepicker #ds="ngbDatepicker" />
+                            <button class="btn btn-outline-secondaary bi bi-calendar3" (click)="ds.toggle()"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="cycleEnd" class="form-label">End Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="cycleEnd" formControlName="cycleEnd" required
+                                ngbDatepicker #de="ngbDatepicker" />
+                            <button class="btn btn-outline-secondaary bi bi-calendar3" (click)="de.toggle()"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="cyclePreStart" class="form-label text-muted">Pre-Cycle Start Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="cyclePreStart" formControlName="cyclePreStart"
+                                ngbDatepicker #dps="ngbDatepicker" />
+                            <button class="btn btn-outline-secondaary bi bi-calendar3" (click)="dps.toggle()"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3">
+                        <label for="cyclePostEnd" class="form-label text-muted">Post-Cycle End Date</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="cyclePostEnd" formControlName="cyclePostEnd"
+                                ngbDatepicker #dpe="ngbDatepicker" />
+                            <button class="btn btn-outline-secondaary bi bi-calendar3" (click)="dpe.toggle()"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <ng-container formGroupName="requirements">
+                <fieldset class="border border-2 p-2">
+                    <legend class="w-auto">Physical Activity Requirements</legend>
+                    <p>Enter the require amount (target) for each physical activity, typically expressed in total number
+                        of minutes. <br /><b>Leave an entry as zero (0) if you do not want it tracked for the cycle.</b>
+                    </p>
+                    <div class="row mb-3">
+                        <label for="miles" class="col col-form-label">Miles</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="miles" formControlName="miles" />
+                            <div class="form-text">({{ config('miles').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="pushUps" class="col col-form-label">Push Ups</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="pushUps" formControlName="pushUps" />
+                            <div class="form-text">({{ config('pushUps').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="sitUps" class="col col-form-label">Sit Ups</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="sitUps" formControlName="sitUps" />
+                            <div class="form-text">({{ config('sitUps').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="burpees" class="col col-form-label">Burpees</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="burpees" formControlName="burpees" />
+                            <div class="form-text">({{ config('burpees').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="kicks" class="col col-form-label">Kicks (Front/Back/Side)</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="kicks" formControlName="kicks" />
+                            <div class="form-text">({{ config('kicks').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="poomsae" class="col col-form-label">Poomsae</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="poomsae" formControlName="poomsae" />
+                            <div class="form-text">({{ config('poomsae').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="selfDefense" class="col col-form-label">Self-Defense</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="selfDefense" formControlName="selfDefense" />
+                            <div class="form-text">({{ config('selfDefense').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="sparring" class="col col-form-label">Sparring Rounds</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="sparring" formControlName="sparring" />
+                            <div class="form-text">({{ config('sparring').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="jumps" class="col col-form-label">Jump Rope</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="jumps" formControlName="jumps" />
+                            <div class="form-text">({{ config('jumps').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="pullUps" class="col col-form-label">Pull Ups</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="pullUps" formControlName="pullUps" />
+                            <div class="form-text">({{ config('pullUps').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="planks" class="col col-form-label">Planks</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="planks" formControlName="planks" />
+                            <div class="form-text">({{ config('planks').units }})</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="rollsFalls" class="col col-form-label">Rolls &amp; Falls</label>
+                        <div class="col">
+                            <input type="number" class="form-control" id="rollsFalls" formControlName="rollsFalls" />
+                            <div class="form-text">({{ config('rollsFalls').units }})</div>
+                        </div>
+                    </div>
+                </fieldset>
+
+            </ng-container>
+
+
+            <fieldset class="border border-2 p-2">
+                <legend class="w-auto">Class Attendence Requirments</legend>
+            </fieldset>
+        </form>
+    </div>
+</div>
