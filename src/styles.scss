@@ -42,9 +42,9 @@ app-root > section#main-footer {
 
 section#main-content {
     display: grid;
-    grid-template-areas: "sidebar content";
+    grid-template-areas: "content";
     grid-template-rows: 1fr;
-    grid-template-columns: fit-content(23.2rem) 1fr;
+    grid-template-columns: 1fr;
 }
 
 .font-magistral-bold {
@@ -65,3 +65,9 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 */
+
+/* Importing Bootstrap SCSS file. */
+@import 'node_modules/bootstrap/scss/bootstrap';
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

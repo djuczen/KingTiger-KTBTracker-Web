@@ -7,7 +7,7 @@ export class NgbLocalDateAdapter extends NgbDateAdapter<LocalDate> {
 
     fromModel(value: LocalDate | null): NgbDateStruct | null {
         if (value) {
-            return { year: value?.year(), month: value?.month().value(), day: value?.dayOfMonth() };
+            return { year: value.year(), month: value.month().value(), day: value.dayOfMonth() };
         }
         return null;
     }

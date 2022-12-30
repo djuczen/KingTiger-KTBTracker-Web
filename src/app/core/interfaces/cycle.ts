@@ -11,6 +11,7 @@ export interface Cycle {
     cycleEnd: LocalDate;
     cyclePreStart?: LocalDate;
     cyclePostEnd?: LocalDate;
+    cycleWeekStart: number;
     requirements: Requirements;
     metadata: Metadata;
 }

@@ -8,7 +8,7 @@ import { NGXLogger } from 'ngx-logger';
 import * as  _ from 'underscore';
 
 import { Cycle } from '@core/interfaces/cycle';
-import { RequirementConfig, Requirements, requirementsConfig } from '@core/interfaces/requirements';
+
 import { CyclesService } from '@core/services/cycles.service';
 import '@js-joda/timezone';
 import { Locale } from '@js-joda/locale';
@@ -23,6 +23,7 @@ import { combineLatest } from 'rxjs';
 import { Utils } from '@core/utils';
 import { FullStatistics } from '@core/interfaces/full-statistics';
 import { StorageService } from '@core/services/storage.service';
+import { RequirementConfig, RequirementsConfiguration } from '@core/config/requirements.config';
 
 
 
@@ -214,7 +215,7 @@ export class ActivityComponent implements OnInit {
   }
 
   config(name: string): RequirementConfig | undefined {
-    return requirementsConfig.get(name);
+    return RequirementsConfiguration.all.get(name);
   }
 
   inRole(role: string): boolean {
@@ -482,7 +483,7 @@ export class ActivityComponent implements OnInit {
         new Map(Object.entries(daily.requirements)).forEach((value, fieldName) => {
           if (fields.includes(fieldName)) {
             //console.debug(`[DEBUG] ${daily.trackingDate} ${fieldName}: new FormControl(${value})`, requirementsConfig.get(fieldName)?.validators);
-            formArrayGroup.set(fieldName, this.fb.nonNullable.control(value, requirementsConfig.get(fieldName)?.validators));
+            formArrayGroup.set(fieldName, this.fb.nonNullable.control(value, RequirementsConfiguration.all.get(fieldName)?.validators));
           }
         });
         //console.debug(`[DEBUG] FormGroup`, formArrayGroup);

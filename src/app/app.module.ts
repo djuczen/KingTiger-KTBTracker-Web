@@ -1,10 +1,9 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
-import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { LoggerModule } from 'ngx-logger';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -35,8 +34,9 @@ import { UsersComponent } from './pages/users/users.component';
 import { CyclesComponent } from './pages/cycles/cycles.component';
 import { EditButtonComponent } from './shared/edit-button/edit-button.component';
 import { CycleEditorComponent } from './pages/cycles/cycle-editor/cycle-editor.component';
-import { NgbDateAdapter, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateAdapter, NgbDatepickerModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbLocalDateAdapter } from '@features/ngb-local-date-adapter';
+import { InputNumericDirective } from '@shared/input-numeric.directive';
 
 
 
@@ -63,11 +63,11 @@ import { NgbLocalDateAdapter } from '@features/ngb-local-date-adapter';
     UsersComponent,
     CyclesComponent,
     EditButtonComponent,
-    CycleEditorComponent
+    CycleEditorComponent,
+    InputNumericDirective,
   ],
   imports: [
     BrowserModule,
-    FlexLayoutModule,
     HttpClientModule,
     ReactiveFormsModule,
     AppRoutingModule,
@@ -80,7 +80,8 @@ import { NgbLocalDateAdapter } from '@features/ngb-local-date-adapter';
     // ...Firebase Modules...
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    NgbDatepickerModule
+    NgbModule,
+    NgbDatepickerModule,
   ],
   providers: [
     httpInterceptorProviders,

@@ -15,20 +15,20 @@
                             <th>Ends</th>
                             <th>Weeks</th>
                             <th>Days</th>
-                            <th><i class="bi bi-plus-circle"></i></th>
+                            <th><button type="button" class="btn btn-link" (click)="addCycle()"><i
+                                        class="bi bi-plus-circle"></i></button></th>
                         </tr>
                     </thead>
                     <tbody>
                         <ng-container formArrayName="cycles">
-                            <ng-container *ngFor="let cycleForm of cycles.controls; let i = index">
+                            <ng-container *ngFor="let cycle of cyclesList; let i = index">
                                 <tr [formGroupName]="i">
-                                    <td>{{ cyclesList[i].title }}</td>
-                                    <td>{{ cyclesList[i].cycleStart }}</td>
-                                    <td>{{ cyclesList[i].cycleEnd }}</td>
-                                    <td>{{ cycleWeeks(cyclesList[i]) }}</td>
-                                    <td>{{ cycleDays(cyclesList[i]) }}</td>
-                                    <td><button (click)="openEditor(cyclesList[i])"><i
-                                                class="bi bi-pencil"></i></button></td>
+                                    <td>{{ cycle.title }}</td>
+                                    <td>{{ cycle.cycleStart }}</td>
+                                    <td>{{ cycle.cycleEnd }}</td>
+                                    <td>{{ cycleWeeks(cycle) }}</td>
+                                    <td>{{ cycleDays(cycle) }}</td>
+                                    <td><button (click)="updateCycle(cycle)"><i class="bi bi-pencil"></i></button></td>
                                 </tr>
                             </ng-container>
                         </ng-container>

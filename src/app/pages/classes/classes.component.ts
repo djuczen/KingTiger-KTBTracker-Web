@@ -15,9 +15,9 @@ import { CyclesService } from '@core/services/cycles.service';
 import { CandidatesService } from '@core/services/candidates.service';
 import { ChronoUnit, LocalDate } from '@js-joda/core';
 import { TrackingService } from '@core/services/tracking.service';
-import { RequirementConfig, requirementsConfig } from '@core/interfaces/requirements';
 import { Tracking } from '@core/interfaces/tracking';
 import { Utils } from '@core/utils';
+import { RequirementConfig, RequirementsConfiguration } from '@core/config/requirements.config';
 
 
 
@@ -179,7 +179,7 @@ export class ClassesComponent implements OnInit {
   }
 
   config(name: string): RequirementConfig | undefined {
-    return requirementsConfig.get(name);
+    return RequirementsConfiguration.all.get(name);
   }
 
   //
@@ -383,7 +383,7 @@ export class ClassesComponent implements OnInit {
         new Map(Object.entries(daily.requirements)).forEach((value, fieldName) => {
           if (fields.includes(fieldName)) {
             //console.debug(`[DEBUG] ${daily.trackingDate} ${fieldName}: new FormControl(${value})`, requirementsConfig.get(fieldName)?.validators);
-            formArrayGroup.set(fieldName, this.fb.nonNullable.control(value, requirementsConfig.get(fieldName)?.validators));
+            formArrayGroup.set(fieldName, this.fb.nonNullable.control(value, RequirementsConfiguration.all.get(fieldName)?.validators));
           }
         });
         //console.debug(`[DEBUG] FormGroup`, formArrayGroup);

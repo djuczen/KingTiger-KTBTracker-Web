@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Requirements, requirementsConfig } from '@core/interfaces/requirements';
+import { RequirementsConfiguration } from '@core/config/requirements.config';
+import { Requirements } from '@core/interfaces/requirements';
+
 
 @Component({
   selector: 'app-requirements-editor',
@@ -61,7 +63,7 @@ export class RequirementsEditorComponent implements OnInit {
   }
 
   requirementTitle(field: string): string {
-    return requirementsConfig.get(field)?.title || '-?-';
+    return RequirementsConfiguration.all.get(field)?.title || '-?-';
   }
 
   requirementMax(field: string): number {

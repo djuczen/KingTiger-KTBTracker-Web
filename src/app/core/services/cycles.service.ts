@@ -41,4 +41,11 @@ export class CyclesService {
   getCurrentCycle(): Observable<Cycle> {
     return this.http.get<Cycle>(`${environment.api.url}/api/cycles/current`);
   }
+
+  updateCycle(cycle: Cycle): Observable<Cycle> {
+    if (cycle.id) {
+      return this.http.put<Cycle>(`${environment.api.url}/api/cycles/${cycle.id}`, cycle);
+    }
+    return this.http.post<Cycle>(`${environment.api.url}/api/cycles`, cycle);
+  }
 }

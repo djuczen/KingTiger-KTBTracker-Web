@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, resolveForwardRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Cycle } from '@core/interfaces/cycle';
 import { CyclesService } from '@core/services/cycles.service';
-import { ChronoUnit } from '@js-joda/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ChronoUnit, LocalDate } from '@js-joda/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NGXLogger } from 'ngx-logger';
 import { CycleEditorComponent } from './cycle-editor/cycle-editor.component';
 
@@ -18,6 +18,8 @@ export class CyclesComponent implements OnInit {
 
   cyclesList: Cycle[] = [];
   
+  private modalRef: NgbModalRef | null = null;
+
   constructor(
     private logger: NGXLogger,
     private fb: FormBuilder,
@@ -41,13 +43,38 @@ export class CyclesComponent implements OnInit {
     return this.cyclesForm.get('cycles') as FormArray;
   }
 
-  openEditor(cycle: Cycle) {
-    window.alert(`Cycle: ${JSON.stringify(cycle)}`)
+  async addCycle() {
+    let createdCycle = await this.openEditor(null);
+    this.logger.debug('addCycle...', createdCycle);
+    this.cyclesService.updateCycle(createdCycle)
+      .subscribe({
+        next: (cycle) => {
+          this.logger.debug('created', cycle);
+        }
+      });
+  }
+
+  async updateCycle(cycle: Cycle) {
+    let updatedCycle = await this.openEditor(cycle);
+    this.logger.debug('updateCycle...', updatedCycle);
+    this.cyclesService.updateCycle(updatedCycle)
+    .subscribe({
+      next: (cycle) => {
+        this.logger.debug('updated', cycle);
+        this.getCycles();
+      }
+    });
+  }
+
+  openEditor(cycle: Cycle | null): Promise<Cycle> {
     const modalRef = this.modalService.open(CycleEditorComponent, { size: 'xl', scrollable: true });
     modalRef.componentInstance.cycle = cycle;
+
+    return modalRef.result.then(() => new Promise<Cycle>(resolve => resolve(modalRef.componentInstance.cycle)));
   }
 
   getCycles() {
+    this.cyclesList = [];
     this.cyclesService.getCycles()
       .subscribe({
         next: (cycles) => {
