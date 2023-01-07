@@ -1,0 +1,13 @@
+//
+// Repositories
+//
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    google()
+}
+
+//allprojects {
+//    maven { url("http://jcenter.bintray.com") allowInsecureProtocol(true) }
+//}

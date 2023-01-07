@@ -1,0 +1,23 @@
+server {
+  listen 80;
+  listen [::]:80;
+  server_name localhost;
+
+  proxy_http_version 1.1;
+  proxy_set_header Host localhost;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection 'upgrade';
+  proxy_cache_bypass $http_upgrade;
+
+  location /api/ {
+    proxy_set_header Host ktbtracker-api:9080;
+    proxy_pass http://ktbtracker-api:9080/api/;
+  }
+
+  location / {
+    root /usr/share/nginx/html;
+    index index.html;
+
+    try_files $uri$args $uri$args/ /index.html;
+  }
+}
