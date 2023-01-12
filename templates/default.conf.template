@@ -9,6 +9,11 @@ server {
   proxy_set_header Connection 'upgrade';
   proxy_cache_bypass $http_upgrade;
 
+  location ~* \.(eot|otf|ttf|woff|woff2)$ {
+      add_header Access-Control-Allow-Origin *;
+      expires max;
+  }
+
   location /api/ {
     proxy_set_header Host ktbtracker-api:9080;
     proxy_pass http://ktbtracker-api:9080/api/;

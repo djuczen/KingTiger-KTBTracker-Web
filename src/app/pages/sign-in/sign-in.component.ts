@@ -1,7 +1,11 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { CandidatesService } from '@core/services/candidates.service';
+import { UsersService } from '@core/services/users.service';
 import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { NGXLogger } from 'ngx-logger';
 
 
 
@@ -14,9 +18,12 @@ export class SignInComponent implements OnInit {
   returnUrl: string | undefined;
 
   constructor(
+    private logger: NGXLogger,
     private route: ActivatedRoute, 
     public router: Router,
-    public authService: AuthService
+    public authService: AuthService,
+    private usersService: UsersService,
+    private candidatesService: CandidatesService
   ) { 
   }
 
@@ -25,15 +32,17 @@ export class SignInComponent implements OnInit {
   }
 
   handleEmailSignIn(email: string, password: string) {
-    console.debug(`[DEBUG] handleEmailSignIn...`, email, password);
+    this.logger.debug(`handleEmailSignIn...`, email, password);
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.debug(`[DEBUG] User signed in!`);
+      .then((credential) => {
+        this.logger.debug(`handleEmailSignIn: User signed in!`);
+        this.logger.debug(`handleEmailSignIn: Credential and user`, credential, credential.user);
+        this.checkUser(credential.user.uid);
         this.router.navigate([this.returnUrl]);
       })
       .catch((error) => {
-        console.error(`[ERROR] Login Failed!`, error.code, error.message);
+        this.logger.error(`handleEmailSignIn: Login Failed!`, error.code, error.message);
       })
   }
 
@@ -41,24 +50,41 @@ export class SignInComponent implements OnInit {
   }
 
   handleGoogleSignIn() {
-    console.debug(`[DEBUG] Google sign in...`)
+    this.logger.debug(`handleGoogleSignIn...`)
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
-        console.debug(`[DEBUG] Logged in!`);
+        this.logger.debug(`handleGoogleSignIn: Logged in!`);
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const user = result.user;
-        console.debug(`[DEBUG] Credential and user`, credential, user);
+        this.logger.debug(`handleGoogleSignIn: Credential and user`, credential, user);
+        this.checkUser(user.uid);
         this.router.navigate([this.returnUrl]);
       })
       .catch((error) => {
-        console.error(`[ERROR] Login Failed!`, error.code, error.message);
+        this.logger.error(`handleGoogleSignIn: Login Failed!`, error.code, error.message);
         const credential = GoogleAuthProvider.credentialFromError(error);
         const user = error.email;
-        console.debug(`[DEBUG] Credential and user`, credential, user);
+        this.logger.debug(`handleGoogleSignIn: Credential and user`, credential, user);
       })
   }
 
-
+  checkUser(userId: string) {
+    this.logger.debug('checkUser...', userId);
+    this.candidatesService.getCurrentCandidate()
+    //this.usersService.getUser(userId)
+      .subscribe({
+        next: (user) => {
+          this.logger.debug('checkUser: Candidate exists!');
+        },
+        error: (error) => {
+          const httpError = error as HttpErrorResponse;
+          if (httpError.status == 404) {
+            this.logger.debug('checkUser: Candidate does NOT exist!');
+            this.router.navigate(['register']);
+          }
+        }
+      });
+  }
 }

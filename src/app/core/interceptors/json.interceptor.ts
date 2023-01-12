@@ -7,7 +7,7 @@ import {
   HttpResponse
 } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset } from '@js-joda/core';
+import { Instant, LocalDate, LocalDateTime, ZonedDateTime, ZoneId, ZoneOffset } from '@js-joda/core';
 
 @Injectable()
 export abstract class JsonParser {
@@ -64,6 +64,11 @@ export function reviver(key: string, value: any) {
     return LocalDate.parse(value.toString());
   }
 
+  // User Record Timestamps ... ZonedDateTime
+  if (key == 'createdAt' || key == 'lastLoginAt' || key == 'lastRefreshAt' || key == 'tokensValidAfterTimestamp') {
+    return Instant.parse(value.toString());
+  }
+
   // Metadata ... LocalDateTime (converted from UTC - ISO_INSTANT format)
   if (key === 'created' || key === 'modified') {
     //console.log('LocalDateTime<-string', LocalDateTime.ofInstant(Instant.parse(value), ZoneId.systemDefault()), value);
@@ -82,6 +87,11 @@ export function reviver(key: string, value: any) {
  */
 export function replacer(key: string, value: any) {
   //console.log(`replacer: (${typeof value}) ${key}=${value}`);
+
+    // User Record Timestamps ... ZonedDateTime
+    if (key == 'createdAt' || key == 'lastLoginAt' || key == 'lastRefreshAt' || key == 'tokensValidAfterTimestamp') {
+      return Instant.parse(value).toString();
+    }
 
     // Metadata ... LocalDateTime (converted to UTC - ISO_INSTANT format)
     if (key === 'created' || key === 'modified') {

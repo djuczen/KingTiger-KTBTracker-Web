@@ -36,8 +36,8 @@ task createDist(type: Task) {
     def indexHtmlFile = layout.projectDirectory.file("dist/index.html").asFile
     def indexHtml = indexHtmlFile.getText('UTF-8')
 
-    indexHtml = indexHtml.replaceAll(/<style([^>]*)>/, '<style type="text/css"$1>')
-    indexHtml = indexHtml.replaceAll(/<link([^>]*)rel="stylesheet">/, '<link type="text/css"$1rel="stylesheet">')
+    indexHtml = indexHtml.replaceAll(/<style>/, '<style type="text/css">')
+    //indexHtml = indexHtml.replaceAll(/<link([^>]*)rel="stylesheet">/, '<link type="text/css"$1rel="stylesheet">')
 
     indexHtmlFile.write(indexHtml)
   }
