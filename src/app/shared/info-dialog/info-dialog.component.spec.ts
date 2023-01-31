@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {} from 'jasmine';
 
-import { SignInComponent } from './sign-in.component';
+import { InfoDialogComponent } from './info-dialog.component';
 
-describe('SignInComponent', () => {
-  let component: SignInComponent;
-  let fixture: ComponentFixture<SignInComponent>;
+describe('InfoDialogComponent', () => {
+  let component: InfoDialogComponent;
+  let fixture: ComponentFixture<InfoDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SignInComponent ]
+      declarations: [ InfoDialogComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SignInComponent);
+    fixture = TestBed.createComponent(InfoDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

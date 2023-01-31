@@ -24,7 +24,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivityChartComponent } from './shared/activity-chart/activity-chart.component';
 import { ActivityComponent } from './pages/activity/activity.component';
 import { RequirementsEditorComponent } from './shared/requirements-editor/requirements-editor.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LocalDatePipe } from '@core/pipes/local-date.pipe';
 import { CycleWeekHeaderComponent } from './shared/cycle-week-header/cycle-week-header.component';
 import { RoundedPipe } from '@core/pipes/rounded.pipe';
@@ -37,6 +37,11 @@ import { CycleEditorComponent } from './pages/cycles/cycle-editor/cycle-editor.c
 import { NgbDateAdapter, NgbDatepickerModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbLocalDateAdapter } from '@features/ngb-local-date-adapter';
 import { InputNumericDirective } from '@shared/input-numeric.directive';
+import { RecaptchaFormsModule, RecaptchaModule, RecaptchaV3Module, RECAPTCHA_V3_SITE_KEY } from 'ng-recaptcha';
+import { CoreModule } from '@core/core.module';
+import { InfoDialogComponent } from './shared/info-dialog/info-dialog.component';
+import { RegisterCredentialsComponent } from './pages/register/register-credentials/register-credentials.component';
+import { RegisterCandidateInfoComponent } from './pages/register/register-candidate-info/register-candidate-info.component';
 
 
 
@@ -47,6 +52,8 @@ import { InputNumericDirective } from '@shared/input-numeric.directive';
     SignInComponent,
     SignUpComponent,
     RegisterComponent,
+    RegisterCredentialsComponent,
+    RegisterCandidateInfoComponent,
     ForgotPasswordComponent,
     VerifyEmailComponent,
     HeaderComponent,
@@ -65,10 +72,13 @@ import { InputNumericDirective } from '@shared/input-numeric.directive';
     EditButtonComponent,
     CycleEditorComponent,
     InputNumericDirective,
+    InfoDialogComponent,
   ],
   imports: [
+    CoreModule,
     BrowserModule,
     HttpClientModule,
+    FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -80,6 +90,9 @@ import { InputNumericDirective } from '@shared/input-numeric.directive';
     // ...Firebase Modules...
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
+    RecaptchaModule,
+    RecaptchaFormsModule,
+    RecaptchaV3Module,
     NgbModule,
     NgbDatepickerModule,
   ],
@@ -87,6 +100,7 @@ import { InputNumericDirective } from '@shared/input-numeric.directive';
     httpInterceptorProviders,
     { provide: JsonParser, useClass: CustomJsonParser },
     { provide: NgbDateAdapter, useClass: NgbLocalDateAdapter },
+    { provide: RECAPTCHA_V3_SITE_KEY, useValue: environment.recaptcha.siteKey },
   ],
   bootstrap: [AppComponent]
 })

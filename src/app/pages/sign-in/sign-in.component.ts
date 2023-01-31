@@ -4,8 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { CandidatesService } from '@core/services/candidates.service';
 import { UsersService } from '@core/services/users.service';
-import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, User } from 'firebase/auth';
 import { NGXLogger } from 'ngx-logger';
+import { combineLatest, first, forkJoin, pipe } from 'rxjs';
 
 
 
@@ -38,7 +39,7 @@ export class SignInComponent implements OnInit {
       .then((credential) => {
         this.logger.debug(`handleEmailSignIn: User signed in!`);
         this.logger.debug(`handleEmailSignIn: Credential and user`, credential, credential.user);
-        this.checkUser(credential.user.uid);
+        this.checkUser('');
         this.router.navigate([this.returnUrl]);
       })
       .catch((error) => {
@@ -59,7 +60,7 @@ export class SignInComponent implements OnInit {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const user = result.user;
         this.logger.debug(`handleGoogleSignIn: Credential and user`, credential, user);
-        this.checkUser(user.uid);
+        this.checkUser(credential?.idToken);
         this.router.navigate([this.returnUrl]);
       })
       .catch((error) => {
@@ -70,21 +71,18 @@ export class SignInComponent implements OnInit {
       })
   }
 
-  checkUser(userId: string) {
-    this.logger.debug('checkUser...', userId);
-    this.candidatesService.getCurrentCandidate()
-    //this.usersService.getUser(userId)
-      .subscribe({
-        next: (user) => {
-          this.logger.debug('checkUser: Candidate exists!');
-        },
-        error: (error) => {
-          const httpError = error as HttpErrorResponse;
-          if (httpError.status == 404) {
-            this.logger.debug('checkUser: Candidate does NOT exist!');
-            this.router.navigate(['register']);
-          }
-        }
-      });
+  checkUser(idToken?: string) {
+    this.logger.debug('checkUser...', idToken);
+    forkJoin({
+      accountInfo: this.usersService.getUserInfo(),
+      candidate: this.candidatesService.getCurrentCandidate(),
+    }).subscribe({
+      next: ({accountInfo, candidate}) => {
+        this.logger.info('checkUser:', accountInfo, candidate);
+      },
+      error: (error) => {
+        this.logger.error('checkUser: Oh, CRAP!', error);
+      }
+    });
   }
 }

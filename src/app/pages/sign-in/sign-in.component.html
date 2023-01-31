@@ -9,29 +9,13 @@
             </div>
           </div>
           <div class="form-floating mb-3">
-            <input
-              type="email"
-              name="email"
-              class="form-control"
-              id="signin-email"
-              aria-describedby="email-help"
-              placeholder="Enter Email"
-              #email
-              required
-            />
+            <input type="email" name="email" class="form-control" id="signin-email" aria-describedby="email-help"
+              placeholder="Enter Email" #email required />
             <label for="signin-email">Email Address</label>
           </div>
           <div class="form-floating mb-3">
-            <input
-              type="password"
-              name="password"
-              class="form-control"
-              id="signin-password"
-              aria-describedby="password-help"
-              placeholder="Enter Password"
-              #password
-              required
-            />
+            <input type="password" name="password" class="form-control" id="signin-password"
+              aria-describedby="password-help" placeholder="Enter Password" #password required />
             <label for="signin-password">Password</label>
           </div>
           <div class="form-group">
@@ -41,10 +25,7 @@
             </p>
           </div>
           <div class="col-md-12 text-center">
-            <button
-              class="btn btn-block btn-primary"
-              (click)="handleEmailSignIn(email.value, password.value)"
-            >
+            <button class="btn btn-block btn-primary" (click)="handleEmailSignIn(email.value, password.value)">
               Login
             </button>
           </div>
@@ -59,17 +40,11 @@
           </div>
           <div class="col-md-12 mb-3">
             <div class="d-grid gap-2 d-md-block text-center">
-              <button
-                class="btn btn-outline-primary mz-2"
-                (click)="handleAppleSignIn()"
-              >
+              <button class="btn btn-outline-primary mx-2" (click)="handleAppleSignIn()">
                 <i class="bi-apple"></i>
                 Apple
               </button>
-              <button
-                class="btn btn-outline-primary mx-2"
-                (click)="handleGoogleSignIn()"
-              >
+              <button class="btn btn-outline-primary mx-2" (click)="handleGoogleSignIn()">
                 <i class="bi-google"></i>
                 Google
               </button>
@@ -77,7 +52,7 @@
           </div>
           <div class="form-group">
             <p class="text-center">
-              Don't have account? <a href="#" id="signup">Sign up here</a>
+              Don't have account? <a routerLink="/register" id="signup">Sign up here</a>
             </p>
           </div>
         </div>

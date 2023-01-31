@@ -10,8 +10,6 @@
         <h4> {{ currentCycle.cycleStart | localDate:'fullDate' }} &mdash; {{ currentCycle.cycleEnd |
           localDate:'fullDate' }}
         </h4>
-        <p>{{ cycleDays }} {{ cycleDay }} {{ cycleWeeks }} {{ currentWeek }} {{ currentDate }} {{ weekStarts }} {{
-          weekEnds }}</p>
       </div>
     </div>
     <div class="row container" *ngIf="!inRole('xadmin')">
@@ -23,8 +21,9 @@
               <th>
                 <div class="d-flex">
                   <div>
-                    <button type="button" class="btn btn-rounded border-0" [disabled]="(currentWeek + 1) <= 1">
-                      <a [routerLink]="currentRoute" [queryParams]="{week: (currentWeek + 1) - 1}"
+                    <button type="button" class="btn btn-rounded border-0"
+                      [disabled]="currentCycle.weekOf(currentWeek) <= 0">
+                      <a [routerLink]="currentRoute" [queryParams]="{week: (currentCycle.weekOf(currentWeek) + 1) - 1}"
                         queryParamsHandling="merge">
                         <i class="text-white fs-2 bi bi-arrow-left-circle-fill"></i>
                       </a>
@@ -34,12 +33,13 @@
                     <h2 class="text-center font-magistral-bold">
                       <app-activity-chart size="2rem" [percent]="weekProgress()">
                       </app-activity-chart>
-                      Week {{ currentWeek + 1 }}
+                      Week {{ currentCycle.weekOf(currentWeek) + 1 }}
                     </h2>
                   </div>
                   <div>
-                    <button type="button" class="btn btn-rounded border-0" [disabled]="(currentWeek + 1) >= cycleWeeks">
-                      <a [routerLink]="currentRoute" [queryParams]="{week: (currentWeek + 1) + 1}"
+                    <button type="button" class="btn btn-rounded border-0"
+                      [disabled]="(currentCycle.weekOf(currentWeek) + 1) >= currentCycle.cycleWeeks">
+                      <a [routerLink]="currentRoute" [queryParams]="{week: (currentCycle.weekOf(currentWeek) + 1) + 1}"
                         queryParamsHandling="merge">
                         <i class="text-white fs-2 bi bi-arrow-right-circle-fill"></i>
                       </a>
@@ -50,15 +50,15 @@
             </tr>
             <tr class="table-dark">
               <th class="text-center">
-                {{ weekStarts | localDate:'fullDate' }} &mdash; {{ weekEnds | localDate:'fullDate' }}
+                {{ currentWeek.starts | localDate:'fullDate' }} &mdash; {{ currentWeek.ends | localDate:'fullDate' }}
               </th>
             </tr>
             <tr class="table-dark">
               <th class="text-center">
-                <button type="button" class="btn btn-link" *ngFor="let w of range(cycleWeeks)">
+                <button type="button" class="btn btn-link" *ngFor="let w of range(currentCycle.cycleWeeks)">
                   <a [routerLink]="currentRoute" [queryParams]="{week: w + 1}" queryParamsHandling="merge">
                     <i class="bi bi-circle-fill"
-                      [ngStyle]="{color: weekColor(w), opacity: w === currentWeek ? '1.0' : '0.5'}"></i>
+                      [ngStyle]="{color: weekColor(w), opacity: w === currentCycle.weekOf(currentWeek) ? '1.0' : '0.5'}"></i>
                   </a>
                 </button>
               </th>
@@ -79,27 +79,27 @@
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(weeklyA, 'miles')">
                               </app-activity-chart>
-                              {{ config('miles')?.title }}
+                              {{ getConfig('miles')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(weeklyA, 'pullUps')">
                               </app-activity-chart>
-                              {{ config('pullUps')?.title }}
+                              {{ getConfig('pullUps')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(weeklyA, 'planks')">
                               </app-activity-chart>
-                              {{ config('planks')?.title }}
+                              {{ getConfig('planks')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(weeklyA, 'rollsFalls')">
                               </app-activity-chart>
-                              {{ config('rollsFalls')?.title }}
+                              {{ getConfig('rollsFalls')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(weeklyA, 'journals')">
                               </app-activity-chart>
-                              {{ config('journals')?.title }}
+                              {{ getConfig('journals')?.title }}
                             </th>
                             <th></th>
                           </tr>
@@ -116,7 +116,7 @@
                                     [ngClass]="weeklyAForm.get('miles')?.errors ? 'is-invalid' : ''"
                                     formControlName="miles" />
                                   <div class="invalid-feedback">
-                                    Enter {{ config('miles')?.units }}
+                                    Enter {{ getConfig('miles')?.units }}
                                   </div>
                                 </td>
                                 <td>
@@ -124,7 +124,7 @@
                                     [ngClass]="weeklyAForm.get('pullUps')?.errors ? 'is-invalid' : ''"
                                     formControlName="pullUps" />
                                   <div class="invalid-feedback">
-                                    Enter {{ config('pullUps')?.units }}
+                                    Enter {{ getConfig('pullUps')?.units }}
                                   </div>
                                 </td>
                                 <td>
@@ -132,7 +132,7 @@
                                     [ngClass]="weeklyAForm.get('planks')?.errors ? 'is-invalid' : ''"
                                     formControlName="planks" />
                                   <div class="invalid-feedback">
-                                    Enter {{ config('planks')?.units }}
+                                    Enter {{ getConfig('planks')?.units }}
                                   </div>
                                 </td>
                                 <td>
@@ -140,7 +140,7 @@
                                     [ngClass]="weeklyAForm.get('rollsFalls')?.errors ? 'is-invalid' : ''"
                                     formControlName="rollsFalls" />
                                   <div class="invalid-feedback">
-                                    Enter {{ config('rollsFalls')?.units }}
+                                    Enter {{ getConfig('rollsFalls')?.units }}
                                   </div>
                                 </td>
                                 <td>
@@ -199,22 +199,22 @@
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyA, 'jumps')">
                               </app-activity-chart>
-                              {{ config('jumps')?.title }}
+                              {{ getConfig('jumps')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyA, 'pushUps')">
                               </app-activity-chart>
-                              {{ config('pushUps')?.title }}
+                              {{ getConfig('pushUps')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyA, 'sitUps')">
                               </app-activity-chart>
-                              {{ config('sitUps')?.title }}
+                              {{ getConfig('sitUps')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyA, 'burpees')">
                               </app-activity-chart>
-                              {{ config('burpees')?.title }}
+                              {{ getConfig('burpees')?.title }}
                             </th>
                             <th></th>
                           </tr>
@@ -282,17 +282,17 @@
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyB, 'poomsae')">
                               </app-activity-chart>
-                              {{ config('poomsae')?.title }}
+                              {{ getConfig('poomsae')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyB, 'selfDefense')">
                               </app-activity-chart>
-                              {{ config('selfDefense')?.title }}
+                              {{ getConfig('selfDefense')?.title }}
                             </th>
                             <th>
                               <app-activity-chart size="1.5rem" [percent]="weeklyProgress(dailyB, 'kicks')">
                               </app-activity-chart>
-                              {{ config('kicks')?.title }}
+                              {{ getConfig('kicks')?.title }}
                             </th>
                             <th></th>
                           </tr>
@@ -368,11 +368,11 @@
           <tr *ngFor="let candidate of candidateList; let i = index">
             <td>{{ candidate.displayName }}</td>
             <td class="text-center">
-              <button type="button" class="btn btn-link" *ngFor="let w of range(cycleWeeks)">
+              <button type="button" class="btn btn-link" *ngFor="let w of range(currentCycle.cycleWeeks)">
                 <a [routerLink]="currentRoute" [queryParams]="{week: w + 1, can_id: candidate.id }"
                   queryParamsHandling="merge">
                   <i class="bi bi-circle-fill"
-                    [ngStyle]="{color: weekColor(w, i), opacity: w === currentWeek ? '1.0' : '0.5'}"></i>
+                    [ngStyle]="{color: weekColor(w, i), opacity: w === currentCycle.weekOf(currentWeek) ? '1.0' : '0.5'}"></i>
                 </a>
               </button>
             </td>

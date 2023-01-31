@@ -17,9 +17,12 @@ export const environment = {
     appId: "1:605352235793:web:42346a08b24cd3786b72b0",
     measurementId: "G-QB3J6TD92Y"
   },
+  recaptcha: {
+    siteKey: '6Lc2egIkAAAAAAIY11Ak8pdCaoGwmt4oQefhrtbh',
+  },
   api: {
     url: ''
-  }
+  },
 };
 
 /*
