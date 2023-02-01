@@ -136,6 +136,11 @@ export class CycleCandidateComponent {
         return true;
     }
 
+    /**
+     * 
+     * @param formGroup 
+     * @returns 
+     */
     canEditTitle(formGroup: AbstractControl): string {
         if (!this.currentGroups.includes('admin')) {
             if (this.currentCandidate?.userId === this.currentUser?.uid) {
