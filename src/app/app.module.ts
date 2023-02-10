@@ -23,6 +23,7 @@ import { ProgressMeterComponent } from '@shared/progress-meter/progress-meter.co
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivityChartComponent } from './shared/activity-chart/activity-chart.component';
 import { ActivityComponent } from './pages/activity/activity.component';
+import { ActivityEditorComponent } from './pages/activity/activity-editor/activity-editor.component';
 import { RequirementsEditorComponent } from './shared/requirements-editor/requirements-editor.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LocalDatePipe } from '@core/pipes/local-date.pipe';
@@ -42,6 +43,8 @@ import { CoreModule } from '@core/core.module';
 import { InfoDialogComponent } from './shared/info-dialog/info-dialog.component';
 import { RegisterCredentialsComponent } from './pages/register/register-credentials/register-credentials.component';
 import { RegisterCandidateInfoComponent } from './pages/register/register-candidate-info/register-candidate-info.component';
+import { MaterialModule } from './material.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 
 
@@ -61,6 +64,7 @@ import { RegisterCandidateInfoComponent } from './pages/register/register-candid
     ProgressMeterComponent,
     ActivityChartComponent,
     ActivityComponent,
+    ActivityEditorComponent,
     RequirementsEditorComponent,
     LocalDatePipe,
     CycleWeekHeaderComponent,
@@ -87,6 +91,7 @@ import { RegisterCandidateInfoComponent } from './pages/register/register-candid
       level: environment.logLevel,
       serverLogLevel: environment.serverLogLevel,
     }),
+    MaterialModule,
     // ...Firebase Modules...
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
@@ -95,6 +100,7 @@ import { RegisterCandidateInfoComponent } from './pages/register/register-candid
     RecaptchaV3Module,
     NgbModule,
     NgbDatepickerModule,
+    FontAwesomeModule,
   ],
   providers: [
     httpInterceptorProviders,

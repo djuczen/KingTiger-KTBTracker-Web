@@ -1,0 +1,60 @@
+
+.mat-column-trackingDate {
+    width: 15%;
+}
+
+.mat-column-menu {
+    width: 1%;
+}
+
+table.ktb-navigation {
+    color: white;
+    background-color: black;
+    padding: 0.5rem;
+
+    th h2 {
+        margin-bottom: 0;
+    }
+}
+
+th.ktb-title-container, td.ktb-title-container {
+    width: 100%;
+}
+
+.ktb-title-container {
+    margin: auto;
+}
+
+.ktb-title-container .mat-progress-bar {
+    max-width: 40%;
+    margin: 0.25rem auto 1.5rem;
+}
+
+.ktb-title-container .ktb-title {
+    margin-bottom: 0;
+}
+
+.ktb-title-container .ktb-subtitle {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+a.ktb-navigation-link {
+    > .mat-mdc-unelevated-button:not(:disabled) {
+        color: var(--mdc-filled-button-label-text-color, inherit);
+    }
+
+    > .mat-mdc-unelevated-button.mat-unthemed {
+        --mdc-filled-button-container-color: transparent;
+        --mdc-filled-button-label-text-color: #000;
+    }
+
+    > .mat-mdc-button, .mat-mdc-unelevated-button, .mat-mdc-raised-button, .mat-mdc-outlined-button {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+}
+
+.ktb-navigation-link.mat-mdc-unelevated-button.mat-unthemed {
+    --mdc-filled-button-container-color: transparent;
+    --mdc-filled-button-label-text-color: #000;
+}

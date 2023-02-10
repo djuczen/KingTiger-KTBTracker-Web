@@ -27,3 +27,42 @@ section#main-content {
 section#sidebar {
     min-width: 0;
 }
+
+.ktb-spacer {
+    flex: 1 1 auto;
+}
+
+
+.ktb-wrapper {
+    display: grid;
+    grid-template-areas: "main-header" "main-content" "main-footer";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+
+    .mat-drawer-container, .mat-sidenav-container {
+        grid-area: main-content;
+        display: grid;
+        grid-template-areas: "side . content .";
+        grid-template-columns: fit-content(250px) 5rem 1fr 5rem;
+
+        .mat-drawer, .mat-sidenav {
+            grid-area: side;
+            min-width: 0;
+            max-width: 250px;
+        }
+
+        .mat-drawer-content, .mat-sidenav-content {
+            grid-area: content;
+
+            main {
+                text-align: center;
+            }
+        }
+    }
+}
+
+.mat-sidenav-container, .mat-sidenav-content, .mat-sidenav {
+    height: 100%;
+    height: 100vh;
+}
+

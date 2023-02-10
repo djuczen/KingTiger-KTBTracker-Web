@@ -1,0 +1,87 @@
+@use '@angular/material' as mat;
+/* You can add global styles to this file, and also import other style files */
+
+@include mat.core();
+
+$ktb-primary-palette: (
+    50 : #fde6e5,
+    100 : #fac0bd,
+    200 : #f79792,
+    300 : #f36d66,
+    400 : #f14d45,
+    500 : #ee2e24,
+    600 : #ec2920,
+    700 : #e9231b,
+    800 : #e71d16,
+    900 : #e2120d,
+    A100 : #ffffff,
+    A200 : #ffdbda,
+    A400 : #ffa9a7,
+    A700 : #ff8f8e,
+    contrast: (
+        50: rgba(black, 0.87),
+        100: rgba(black, 0.87),
+        200: rgba(black, 0.87),
+        300: rgba(black, 0.87),
+        400: white,
+        500: white,
+        600: white,
+        700: white,
+        800: white,
+        900: white,
+        A100: rgba(black, 0.87),
+        A200: rgba(black, 0.87),
+        A400: rgba(black, 0.87),
+        A700: rgba(black, 0.87),
+    )
+);
+
+$ktb-accent-palette: (
+    50 : #e4e8f3,
+    100 : #bcc6e1,
+    200 : #8fa0cd,
+    300 : #627ab9,
+    400 : #415eaa,
+    500 : #1f419b,
+    600 : #1b3b93,
+    700 : #173289,
+    800 : #122a7f,
+    900 : #0a1c6d,
+    A100 : #9fadff,
+    A200 : #6c81ff,
+    A400 : #3955ff,
+    A700 : #1f3fff,
+    contrast: (
+        50: rgba(black, 0.87),
+        100: rgba(black, 0.87),
+        200: rgba(black, 0.87),
+        300: white,
+        400: white,
+        500: white,
+        600: white,
+        700: white,
+        800: white,
+        900: white,
+        A100: rgba(black, 0.87),
+        A200: rgba(black, 0.87),
+        A400: white,
+        A700: white,
+    )
+);
+
+$ktb-primary: mat.define-palette($ktb-primary-palette, 500);
+$ktb-accent: mat.define-palette($ktb-accent-palette, 500);
+$ktb-warn: mat.define-palette(mat.$red-palette);
+
+$ktb-light-theme: mat.define-light-theme((
+    color: (
+        primary: $ktb-primary, 
+        accent: $ktb-accent,
+        warn: $ktb-warn,
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+));
+
+@include mat.all-component-themes($ktb-light-theme);
+@include mat.strong-focus-indicators-theme($ktb-light-theme);

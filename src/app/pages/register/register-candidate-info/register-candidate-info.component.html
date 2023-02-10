@@ -3,75 +3,82 @@
         <div class="col-md-5 mx-auto ">
             <div id="register-top">
                 <form [formGroup]="registerForm" class="needs-validation register-form form" novalidate>
-                    <div class="logo mb-3">
-                        <div class="col-md-12 text-center">
-                            <h1 class="text-center font-magistral-bold">Registration</h1>
+                    <div class="shadow p-3 rounded">
+                        <div class="logo mb-3">
+                            <div class="col-md-12 text-center">
+                                <h1 class="text-center font-magistral-bold">Registration</h1>
+                            </div>
                         </div>
-                    </div>
-                    <fieldset formGroupName="candidateInfo">
-                        <legend>Candidate Information {{ currentCycle ? '- ' + currentCycle.title : '' }}</legend>
-                        <p>Provide (or update) your full name (first and last), your current belt rank and if you will
-                            be testing as an
-                            adult or a poom (under age 13) candidate.</p>
-                        <div class="form-floating mb-3">
-                            <input type="firstName" class="form-control" id="register-firstName"
-                                formControlName="firstName" aria-describedby="firstName-help" placeholder="First"
-                                #firstName required [class.is-invalid]="f('candidateInfo.firstName')?.errors" />
-                            <label for="register-firstName">First Name <span class="text-danger">*</span></label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="firstName" class="form-control" id="register-lastName"
-                                formControlName="lastName" aria-describedby="lastName-help" placeholder="Last" #lastName
-                                required [class.is-invalid]="f('candidateInfo.lastName')?.errors" />
-                            <label for="register-firstName">Last Name <span class="text-danger">*</span></label>
-                        </div>
-                        <div class="mb-3">
-                            <label for="register-beltRank">Current Belt Rank</label>
-                            <select class="form-select" id="register-beltRank" formControlName="beltRank"
-                                aria-describedby="beltRank-help" #beltRank required
-                                [class.is-invalid]="f('candidateInfo.beltRank')?.errors">
-                                <option value="" selected>Choose current rank...</option>
-                                <option value="0">BoCho Dan</option>
-                                <option value="1">Il (First) Dan</option>
-                                <option value="2">Yi (Second) Dan</option>
-                                <option value="3">Sam (Third) Dan</option>
-                                <option value="4">Sa (Fourth) Dan</option>
-                            </select>
-                        </div>
+                        <fieldset class="shadow p-2 rounded">
+                            <legend>Candidate Information {{ currentCycle ? '- ' + currentCycle.title : '' }}</legend>
+                            <p>Provide (or update) your full name (first and last), your current belt rank and if you
+                                will
+                                be testing as an
+                                adult or a poom (under age 13) candidate.</p>
+                            <div class="form-floating mb-3">
+                                <input type="firstName" class="form-control" id="register-firstName"
+                                    formControlName="firstName" aria-describedby="firstName-help" placeholder="First"
+                                    #firstName required [class.is-invalid]="f('firstName')?.errors" />
+                                <label for="register-firstName">First Name <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="firstName" class="form-control" id="register-lastName"
+                                    formControlName="lastName" aria-describedby="lastName-help" placeholder="Last"
+                                    #lastName required [class.is-invalid]="f('lastName')?.errors" />
+                                <label for="register-firstName">Last Name <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="register-beltRank">Current Belt Rank</label>
+                                <select class="form-select" id="register-beltRank" formControlName="beltRank"
+                                    aria-describedby="beltRank-help" #beltRank required
+                                    [class.is-invalid]="f('beltRank')?.errors">
+                                    <option value="" selected>Choose current rank...</option>
+                                    <option value="0">BoCho Dan</option>
+                                    <option value="1">Il (First) Dan</option>
+                                    <option value="2">Yi (Second) Dan</option>
+                                    <option value="3">Sam (Third) Dan</option>
+                                    <option value="4">Sa (Fourth) Dan</option>
+                                </select>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="register-poom"
+                                    formControlName="poom" />
+                                <label for="register-poom" class="form-check-label">I am under the age of 13
+                                    <small><em>(Candidate
+                                            will
+                                            not be testing with adult curriculm)</em></small></label>
+                            </div>
+                        </fieldset>
+                        <hr />
                         <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="register-poom" formControlName="poom" />
-                            <label for="register-poom" class="form-check-label">I am under the age of 13
-                                <small><em>(Candidate
-                                        will
-                                        not be testing with adult curriculm)</em></small></label>
+                            <input type="checkbox" class="form-check-input" id="register-confirm"
+                                formControlName="confirm" [class.is-invalid]="f('confirm')?.errors" />
+                            <label for="register-confirm" class="form-check-label">I understand that I may not be able
+                                to
+                                use the tracking app until payment is made and my
+                                registration is approved by a testing cycle administrator.
+                                Designation of split cycle and auditing candidates will be determined during the
+                                approval
+                                process.</label>
                         </div>
-                    </fieldset>
-                    <hr />
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="register-confirm" formControlName="confirm"
-                            [class.is-invalid]="f('confirm')?.errors" />
-                        <label for="register-confirm" class="form-check-label">I understand that I may not be able to
-                            use the tracking app until payment is made and my
-                            registration is approved by a testing cycle administrator.
-                            Designation of split cycle and auditing candidates will be determined during the approval
-                            process.</label>
-                    </div>
 
-                    <div class="form-group">
-                        <p class="text-center">
-                            By registering you accept our
-                            <a href="javascript:void();">Terms Of Use</a>
-                        </p>
-                    </div>
-                    <re-captcha id="register-recaptcha" formControlName="recaptcha"></re-captcha>
-                    <div class="col-md-12 text-center">
-                        <button class="btn btn-block btn-secondary mx-2" (click)="onCancel()">
-                            Cancel
-                        </button>
-                        <button class="btn btn-block btn-primary mx-2" (click)="onSubmit()"
-                            [disabled]="registerForm.invalid">
-                            Register
-                        </button>
+                        <div class="form-group">
+                            <p class="text-center">
+                                By registering you accept our
+                                <a href="javascript:void();">Terms Of Use</a>
+                            </p>
+                        </div>
+                        <re-captcha id="register-recaptcha" formControlName="recaptcha"></re-captcha>
+                        <div class="col-md-12 text-center">
+                            <button class="btn btn-block btn-secondary mx-2" (click)="onCancel()">
+                                Cancel
+                            </button>
+                            <button class="btn btn-block btn-primary mx-2" (click)="onSubmit()"
+                                [disabled]="registerForm.invalid">
+                                Register
+                            </button>
+                        </div>
+
                     </div>
                 </form>
             </div>

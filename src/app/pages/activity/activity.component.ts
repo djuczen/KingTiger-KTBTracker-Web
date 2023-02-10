@@ -1,7 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
+import '@js-joda/timezone';
+import { Locale } from '@js-joda/locale';
+import { LocalDate } from '@js-joda/core';
 import { replacer } from '@core/interceptors/json.interceptor';
 import firebase from 'firebase/compat/app';
 import { NGXLogger } from 'ngx-logger';
@@ -10,15 +14,13 @@ import * as  _ from 'underscore';
 import { Cycle } from '@core/interfaces/cycle';
 
 import { CyclesService } from '@core/services/cycles.service';
-import '@js-joda/timezone';
-import { Locale } from '@js-joda/locale';
-import { LocalDate } from '@js-joda/core';
+
 import { TrackingService } from '@core/services/tracking.service';
 import { Tracking } from '@core/interfaces/tracking';
 import { CandidatesService } from '@core/services/candidates.service';
 import { Candidate } from '@core/interfaces/candidate';
 import { CandidateTracking } from '@core/interfaces/candidate-tracking';
-import { ActivatedRoute, ParamMap, Route, UrlSegment } from '@angular/router';
+import { ActivatedRoute, ParamMap, Route, Router, UrlSegment } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { Utils } from '@core/utils';
 import { FullStatistics } from '@core/interfaces/full-statistics';
@@ -27,6 +29,12 @@ import { RequirementConfig, RequirementsConfiguration } from '@core/config/requi
 import { CycleDates } from '@core/cycle-dates';
 import { CycleCandidateComponent } from '@core/classes/cycle-candidate-component';
 import { CycleWeek } from '@core/interfaces/cycle-week';
+import { DataSource } from '@angular/cdk/collections';
+import { ActivityDataSource } from './activity.datasource';
+import { MatTable } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
+import { Statistics } from '@core/interfaces/statistics';
+import { ActivityEditorComponent } from './activity-editor/activity-editor.component';
 
 
 
@@ -44,6 +52,12 @@ const DAILY_GOALS_B = ['poomsae', 'selfDefense', 'kicks'];
 })
 export class ActivityComponent extends CycleCandidateComponent implements OnInit {
 
+  @ViewChild(MatTable) weeklyTable!: MatTable<Tracking>;
+  @ViewChild(MatTable) dailyATable!: MatTable<Tracking>;
+  @ViewChild(MatTable) dailyBTable!: MatTable<Tracking>;
+  
+  faCircle = faCircle;
+
   requirementsForm: FormGroup = new FormGroup({});
 
   paramsMap: ParamMap | undefined;
@@ -57,17 +71,29 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
   candidateList: Candidate[] = [];
   candidateStatisticsList: FullStatistics[] = [];
 
+  dataSource: ActivityDataSource;
+  displayedColumns = ['date', 'miles', 'pullUps', 'planks', 'rollsFalls', 'journals']
+
+  weeklyColumns = ['trackingDate', 'miles', 'pullUps', 'planks', 'rollsFalls', 'journals', 'menu'];
+  dailyAColumns = ['trackingDate', 'jumps', 'pushUps', 'sitUps', 'burpees', 'poomsae', 'selfDefense', 'kicks', 'menu'];
+  dailyBColumns = ['trackingDate', 'poomsae', 'selfDefense', 'kicks', 'menu'];
+
   constructor(
     logger: NGXLogger,
     fireAuth: AngularFireAuth,
     cyclesService: CyclesService,
     candidatesService: CandidatesService,
     private route: ActivatedRoute,
+    private router: Router,
     private fb: FormBuilder,
+    private dialog: MatDialog,
     private storageService: StorageService,
     private trackingService: TrackingService,
   ) {
     super(logger, fireAuth, cyclesService, candidatesService);
+
+    this.dataSource = new ActivityDataSource(logger, trackingService);
+    this.dataSource.fetchCandidateTracking(this.currentCandidate, LocalDate.now(), LocalDate.now());
 
     this.requirementsForm = this.fb.group({
       weeklyA: this.fb.array(this.formArrayInitializer(WEEKLY_GOALS_A)),
@@ -75,6 +101,28 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
       dailyB: this.fb.array(this.formArrayInitializer(DAILY_GOALS_B))
     });
     this.requirementsForm.disable();
+  }
+
+  onPrevWeek() {
+    if (this.currentCycle && this.currentCycle.weekOf(this.currentWeek) > 0) {
+      this.router.navigate(
+        [],
+        {
+          queryParams: { week: (this.currentCycle.weekOf(this.currentWeek) + 1) - 1 },
+          queryParamsHandling: 'merge'
+        });
+    }
+  }
+
+  onNextWeek() {
+    if (this.currentCycle && (this.currentCycle.weekOf(this.currentWeek) + 1) < this.currentCycle.cycleWeeks) {
+      this.router.navigate(
+        [],
+        {
+          queryParams: { week: (this.currentCycle.weekOf(this.currentWeek) + 1) + 1 },
+          queryParamsHandling: 'merge'
+        });
+    }
   }
 
   // 
@@ -110,12 +158,69 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
   }
 
   weekProgress2(week: number): number {
+    return (this.getWeeklyStats()?.overall || 0) * 100.0;
+  }
+
+
+  displayValue(tracking: Tracking, name: string): number {
+    return _.get(tracking, name, 0);
+  }
+
+  /**
+   * Returns the amount of progress (as a percentage) towards the weekly goal of the specified activity.
+   * 
+   * @param name 
+   * @returns 
+   */
+  weeklyProgressValue(name: string): number {
+    return this.weeklyProgressGoal(name) > 0 ? ((_.get(this.getWeeklyStats(), name) || 0) / this.weeklyProgressGoal(name)) * 100.0 : 0.0;
+  }
+
+  /**
+   * Returns the styling (i.e. color) associated with the weekly progress of the specified activity.
+   * 
+   * @param name 
+   * @returns 
+   */
+  weeklyProgressStyle(name: string): { [key: string]: any } {  
+     return {
+       '--mdc-linear-progress-active-indicator-color': Utils.percentAsColor(this.weeklyProgressValue(name) / 100.0)
+     };
+  }
+
+  /**
+   * Returns the weekly goal (target) for the specified activity.
+   * 
+   * @param name 
+   * @returns 
+   */
+  weeklyProgressGoal(name: string): number {
+    if (this.currentCycle) {
+      const remaining = (_.get(this.currentCycle.requirements || {}, name, 0) as number) - (_.get(this.currentStatistics?.weekly[this.currentCycle?.weekOf(this.currentWeek) || 0] || {}, name, 0) as number);
+      return remaining > 0 ? remaining * ((this.currentCycle.weekOf(this.currentWeek) + 1) / this.currentCycle.cycleWeeks) : 0;
+    }
     return 0;
   }
-  weekProgress(): number {
+
+  weeklyOverallValue(): number {
     return (this.currentStatistics?.weekly[this.currentCycle?.weekOf(this.currentWeek) || 0].overall || 0)  * 100.0;
   }
 
+  weeklyOverallStyle(): { [key: string]: any } {  
+    return {
+      '--mdc-linear-progress-active-indicator-color': Utils.percentAsColor(this.weeklyOverallValue() / 100.0),
+      'max-width': '40%',
+      'margin': '0.5rem auto 1.5rem'
+    };
+ }
+ 
+  private getWeeklyStats(): Statistics {
+    return this.currentStatistics?.weekly[this.currentCycle?.weekOf(this.currentWeek) || 0] || new Statistics();
+  }
+
+  weeklyProgress2(name: string) {
+    this.currentStatistics?.weekly[this.currentCycle?.weekOf(this.currentWeek) || 0]
+  }
   weeklyProgress(formArray: FormArray, controlName: string) {
     let controlProgress = 0;
     for (let control of formArray.controls) {
@@ -136,6 +241,36 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
   // Daily Related Values
   //
 
+  /**
+   * Returns the amount of progress (as a percentage) towards the weekly goal of the specified activity.
+   * 
+   * @param name 
+   * @returns 
+   */
+  dailyProgressValue(name: string): number {
+    return this.dailyGoal(name) > 0 ? ((_.get(this.getWeeklyStats(), name) || 0) / this.dailyGoal(name)) * 100.0 : 0.0;
+  }
+
+  dailyProgressStyle(name: string): { [key: string]: any } {
+    return {
+      '--mdc-linear-progress-active-indicator-color': Utils.percentAsColor(this.dailyProgressValue(name)),
+    };
+  }
+
+  /**
+   * 
+   * @param name 
+   * @returns 
+   */
+  dailyProgressGoal(name: string): number {
+    if (this.currentCycle) {
+      const cycleTarget = _.get(this.currentCycle.requirements || {}, name, 0) as number;
+      return cycleTarget > 0 ? cycleTarget * (1 / this.currentCycle.cycleDays) : 0;
+    }
+    return 0;
+  }
+
+
   dailyProgress(formArray: FormArray, controlName: string) {
     return this.progressOf(formArray, controlName, this.dailyGoal);
   }
@@ -151,6 +286,18 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
   //
   // Cycle Related Values
   //
+
+  cycleOverallValue(): number {
+    return (this.currentStatistics?.cycle.overall || 0)  * 100.0;
+  }
+
+  cycleOverallStyle(): { [key: string]: any } {  
+    return {
+      '--mdc-linear-progress-active-indicator-color': Utils.percentAsColor(this.cycleOverallValue() / 100.0),
+      'max-width': '40%',
+      'margin': '0.5rem auto 1.5rem'
+    };
+ }
 
   cycleProgress(): number {
     return (this.currentStatistics?.cycle.overall || 0)  * 100.0;
@@ -174,6 +321,25 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
     return this.requirementsForm.controls['dailyB'] as FormArray;
   }
 
+  progressValue(tracking: Tracking, name: string) {
+    Object.entries(tracking.requirements)
+  }
+
+  progressStyle(percent: number) {
+    const decimalPct = parseFloat(percent.toString());
+   (Math.abs(decimalPct) > 1.0) ? (decimalPct / 100.0) : decimalPct;
+    return {
+      '--mdc-linear-progress-active-indicator-color': Utils.percentAsColor(((Math.abs(decimalPct) > 1.0) ? (decimalPct / 100.0) : decimalPct))
+    };
+  }
+
+  onEdit(tracking: Tracking, columns: string[]) {
+    const dialogRef = this.dialog.open(ActivityEditorComponent, {
+      data: { tracking: tracking, fields: columns }
+    });
+    dialogRef.componentInstance.tracking = tracking;
+    dialogRef.componentInstance.fields = columns;
+  }
 
   onSubmit() {
     window.alert('Submitted!');
@@ -318,6 +484,10 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
       .subscribe({
         next: (candidateTracking) => {
           this.candidateTracking = candidateTracking;
+          this.logger.debug('Tracking Data...', this.candidateTracking.daily);
+          this.weeklyTable.renderRows();
+          this.dailyATable.renderRows();
+          this.dailyBTable.renderRows();
           // For each tracking date...
           this.requirementsForm = this.fb.group({
             weeklyA: this.fb.array(this.formArrayInitializer(WEEKLY_GOALS_A, candidateTracking.daily)),
@@ -361,6 +531,8 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
 
         // We have our query parameters and our user... load the cycle and tracking data
         this.fetchCurrentCycleAndCandidate();
+        this.fetchCandidateTracking(this.currentCandidate, this.currentWeek.starts, this.currentWeek.ends);
+        this.dataSource.fetchCandidateTracking(this.currentCandidate, this.currentWeek.starts, this.currentWeek.ends);
       }
     });
   }
@@ -405,3 +577,7 @@ export class ActivityComponent extends CycleCandidateComponent implements OnInit
     return goalFunction(controlName) > 0 ? (controlProgress / goalFunction(controlName)) * 100.0 : 0;
   }
 }
+function MatTableDataSource<T>() {
+  throw new Error('Function not implemented.');
+}
+
