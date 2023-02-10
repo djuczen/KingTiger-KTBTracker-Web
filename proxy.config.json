@@ -1,9 +1,12 @@
 {
     "/api/*": {
-        "target": "https://localhost:9443",
+        "target": "http://localhost:9080",
         "secure": false,
         "logLevel": "debug",
-        "changeOrigin": true
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/api": "/api"
+        }
     },
     "/realms/*": {
         "target": "http://localhost:40480",

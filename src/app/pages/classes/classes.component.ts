@@ -18,6 +18,8 @@ import { TrackingService } from '@core/services/tracking.service';
 import { Tracking } from '@core/interfaces/tracking';
 import { Utils } from '@core/utils';
 import { RequirementConfig, RequirementsConfiguration } from '@core/config/requirements.config';
+import { CycleCandidateComponent } from '@core/classes/cycle-candidate-component';
+import { CycleWeek } from '@core/interfaces/cycle-week';
 
 
 
@@ -29,32 +31,29 @@ const WEEKLY_GOALS_A = ['classSaturday', 'classWeekday', 'classPMAA', 'classSpar
   templateUrl: './classes.component.html',
   styleUrls: ['./classes.component.scss']
 })
-export class ClassesComponent implements OnInit {
+export class ClassesComponent extends CycleCandidateComponent implements OnInit {
 
   requirementsForm: FormGroup = new FormGroup({});
 
   paramsMap: ParamMap | undefined;
 
-  currentUser: firebase.User | null | undefined;
-  currentGroups: string[] | undefined = [];
-
-
-  currentCycle: Cycle | null = null;
-  currentCandidate: Candidate | null = null;
+  currentWeek: CycleWeek = new CycleWeek();
 
   currentStatistics: FullStatistics | undefined;
 
   candidateTracking: CandidateTracking | undefined;
   
   constructor(
-    private logger: NGXLogger,
+    logger: NGXLogger,
+    fireAuth: AngularFireAuth,
+    cyclesService: CyclesService,
+    candidatesService: CandidatesService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private cyclesService: CyclesService,
-    private candidatesService: CandidatesService,
     private trackingService: TrackingService,
-    private fireAuth: AngularFireAuth
   ) { 
+    super(logger, fireAuth, cyclesService, candidatesService);
+
     this.requirementsForm = this.fb.group({
       weeklyA: this.fb.array(this.formArrayInitializer(WEEKLY_GOALS_A)),
     });
@@ -73,58 +72,32 @@ export class ClassesComponent implements OnInit {
     return LocalDate.now();
   }
 
-  /**
-   * Returns the zero-based week of the active cycle.
-   * 
-   * If a week number was provided via query parameters ("week") it used (converted to zero-based), otherwise the week relative
-   * to the current date is used.
-   */
-  get currentWeek(): number {
-    if (this.paramsMap?.get('week') !== null) {
-      return Math.min(Math.max(parseInt(this.paramsMap?.get('week') || '1') - 1, 0), this.cycleWeeks);
-    } 
-    return  Math.min(Math.max(this.currentCycle?.cycleStart.until(this.currentDate.plusDays(1), ChronoUnit.WEEKS) || 0, 0), this.cycleWeeks);
-  }
-
   //
   // Week Related Values
   //
 
-  get weekStarts(): LocalDate {
-    if (this.currentCycle) {
-      return this.currentCycle?.cycleStart.plusWeeks(this.currentWeek);
-    }
-    return this.currentDate.minusDays(this.currentDate.dayOfWeek().value());
-  }
-
-  get weekEnds(): LocalDate {
-    return this.weekStarts.plusDays(6);
-  }
-
-  get weekDays(): LocalDate[] {
-    return Array(7).fill(LocalDate.now()).map((value, index) => this.weekStarts.plusDays(index));
+  weekDate(index: number): LocalDate {
+    return this.currentWeek.days[index];
   }
 
   weekDay(index: number): number {
-    return this.weekStarts.plusDays(index).dayOfWeek().value();
+    return this.weekDate(index).dayOfWeek().value();
   }
 
-  weekDate(index: number): LocalDate {
-    return this.weekStarts.plusDays(index);
-  }
- 
   weekColor(week: number): string {
-    if (week >= 0 && week < this.cycleWeeks) {
-      if (this.currentStatistics && this.currentStatistics.weekly && this.currentStatistics.weekly.length >= week) {
-        const overall = this.currentStatistics?.weekly[week].overall || 0;
-        return overall > 0 ? Utils.percentAsColor(this.currentStatistics?.weekly[week].overall || 0) : 'white';
+    if (this.currentCycle) {
+      if (week >= 0 && week < this.currentCycle?.cycleWeeks) {
+        if (this.currentStatistics && this.currentStatistics.weekly && this.currentStatistics.weekly.length >= week) {
+          const overall = this.currentStatistics?.weekly[week].overall || 0;
+          return overall > 0 ? Utils.percentAsColor(this.currentStatistics?.weekly[week].overall || 0) : 'white';
+        }
       }
     }
     return 'white';
   }
 
   weekProgress(): number {
-    return (this.currentStatistics?.weekly[this.currentWeek].overall || 0)  * 100.0;
+    return (this.currentStatistics?.weekly[this.currentCycle?.weekOf(this.currentWeek) || 0].overall || 0)  * 100.0;
   }
 
   weeklyProgress(formArray: FormArray, controlName: string) {
@@ -136,12 +109,11 @@ export class ClassesComponent implements OnInit {
   }
 
   weeklyGoal(name: string): number {
-    if (this.currentCycle === undefined) {
-      return 0;
+    if (this.currentCycle) {
+      const cycleTarget = _.get(this.currentCycle.requirements || {}, name, 0) as number;
+      return cycleTarget > 0 ? cycleTarget * (7 / this.currentCycle.cycleDays) : 0;
     }
-
-    const cycleTarget = _.get(this.currentCycle?.requirements || {}, name, 0) as number;
-    return cycleTarget > 0 ? cycleTarget * (7 / this.cycleDays) : 0;
+    return 0;
   }
 
   //
@@ -150,36 +122,6 @@ export class ClassesComponent implements OnInit {
 
   cycleProgress(): number {
     return (this.currentStatistics?.cycle.overall || 0)  * 100.0;
-  }
- 
-  get cycleWeeks(): number {
-    if (this.currentCycle) {
-      return this.currentCycle?.cycleStart.until(this.currentCycle?.cycleEnd.plusDays(1), ChronoUnit.WEEKS).valueOf();
-    }
-    return 0;
-  }
-
-  get cycleDays(): number {
-    if (this.currentCycle) {
-      return this.currentCycle?.cycleStart.until(this.currentCycle?.cycleEnd.plusDays(1), ChronoUnit.DAYS).valueOf();
-    }
-    return 0;
-  }
-
-  get cycleDay(): number {
-    return this.currentCycle?.cycleStart.until(this.currentDate.plusDays(1), ChronoUnit.DAYS).valueOf() || 0;
-  }
-
-  //
-  // Miscelaneous
-  //
-
-  range(size: number, startAt: number = 0): number[] {
-    return Utils.range(size, startAt);
-  }
-
-  config(name: string): RequirementConfig | undefined {
-    return RequirementsConfiguration.all.get(name);
   }
 
   //
@@ -190,41 +132,8 @@ export class ClassesComponent implements OnInit {
     return this.requirementsForm.controls['weeklyA'] as FormArray;
   }
   
-  formDate(control: AbstractControl): LocalDate {
-    return control.get('date')?.getRawValue() as LocalDate;
-  }
-
   f(control: AbstractControl, name: string): any {
     return control.get(name)?.getRawValue();
-  }
-
-  /**
-   * Determine if tracking records can be edited.
-   * 
-   * Tracking records can be edited if the records are owned by the current user or the current user is an administrator.
-   * 
-   * @param group the reactive FormGroup being checked
-   * @returns 
-   */
-  canEdit(group: AbstractControl): boolean {
-    if (this.currentGroups?.includes('admin')) {
-      return true;
-    }
-    if (this.currentDate.isBefore(this.weekStarts) || this.currentDate.isAfter(this.weekEnds)) {
-      return false;
-    }
-    return this.currentCandidate?.userId === this.currentUser?.uid;
-  }
-
-  canEditTitle(group: AbstractControl): string {
-    if (this.currentDate.isBefore(this.weekStarts) || this.currentDate.isAfter(this.weekEnds)) {
-      return 'Candidates can only edit the current week. Please contact an adminstrator.';
-    }
-    return this.currentCandidate?.userId !== this.currentUser?.uid ? 'Candidates can only edit their own tracking numbers.' : '';
-  }
-
-  isEditable(group: AbstractControl<any, any>): boolean {
-    return group.get('date')?.disabled === true || false;
   }
 
   onSubmit(): void {
@@ -288,7 +197,7 @@ export class ClassesComponent implements OnInit {
             this.currentCandidate = candidate;
 
             // The candidate may have changed or is new, (re-)fetch the tracking data now
-            this.fetchCandidateTracking(this.currentCandidate, this.weekStarts, this.weekEnds);
+            this.fetchCandidateTracking(this.currentCandidate, this.currentWeek.starts, this.currentWeek.ends);
           }
         })
     } else {
@@ -303,7 +212,7 @@ export class ClassesComponent implements OnInit {
             }
 
             // The candidate may have changed or is new, (re-)fetch the tracking data now
-            this.fetchCandidateTracking(this.currentCandidate, this.weekStarts, this.weekEnds);
+            this.fetchCandidateTracking(this.currentCandidate, this.currentWeek.starts, this.currentWeek.ends);
           }
         });
     }
@@ -343,21 +252,20 @@ export class ClassesComponent implements OnInit {
       .subscribe({
         next: (result) => {
           // Re-fetch the tracking date to reflect any updates
-          this.fetchCandidateTracking(candidate, this.weekStarts, this.weekEnds);
+          this.fetchCandidateTracking(candidate, this.currentWeek.starts, this.currentWeek.ends);
         }
       });
   }
 
 
   ngOnInit(): void {
-    combineLatest([this.route.queryParamMap, this.fireAuth.authState, this.fireAuth.idTokenResult]).subscribe({
-      next: ([paramsMap, user, idToken]) => {
+    combineLatest([this.route.queryParamMap]).subscribe({
+      next: ([paramsMap]) => {
         this.paramsMap = paramsMap;
-        this.currentUser = user;
-        this.currentGroups = idToken?.claims['groups'] || [];
+        this.currentWeek = this.currentCycle?.weekDaysOf(paramsMap.get('week')) || new CycleWeek();
 
         // We have our query parameters and our user... load the cycle and tracking data
-        this.fetchCycle();
+        this.fetchCurrentCycleAndCandidate();
       }
     });
   }
@@ -366,7 +274,7 @@ export class ClassesComponent implements OnInit {
     let formArrayGroups: FormGroup[] = [];
 
     if (tracking === undefined) {
-      this.weekDays.forEach((weekDay, day) => {
+      this.currentWeek.days.forEach((weekDay, day) => {
         const formArrayGroup = new Map();
         formArrayGroup.set('date', weekDay);
         fields.forEach((fieldName) => {

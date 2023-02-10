@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { replacer, reviver } from '@core/interceptors/json.interceptor';
+import { Cycle } from '@core/interfaces/cycle';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({
@@ -16,6 +17,9 @@ export class StorageService {
     this.logger.debug(`getItem(${key})`, data);
 
     if (data !== null) {
+      if (data.includes('cycleStart')) {
+        return new Cycle(JSON.parse(data, reviver)) as T;
+      }
       return JSON.parse(data, reviver) as T;
     }
 

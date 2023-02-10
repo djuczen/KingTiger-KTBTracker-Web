@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 
 
 @Component({
-  selector: 'app-header',
+  selector: 'ktb-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+
+  headerLogo: string = 'assets/images/kta-logo.png';
 
   user: any | undefined;
 
@@ -16,6 +18,10 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private firebaseAuth: AngularFireAuth
   ) {
+    if (window.matchMedia('(prefers-color-scheme: dark)').media === 'dark') {
+      this.headerLogo = 'assets/images/ktb-logo-dark.ping';
+    }
+
     this.firebaseAuth.authState
       .subscribe((user) => {
         this.user = user;

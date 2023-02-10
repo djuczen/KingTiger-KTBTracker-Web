@@ -1,0 +1,20 @@
+<form [formGroup]="editorForm">
+    <div class="">
+        <div mat-dialog-title>
+            <h2>{{ tracking?.trackingDate || '' | localDate:'fullDate' }}</h2>
+            <p>Enter what you have accomplished for this day. What you enter will replace any current values and not add
+                to them. </p>
+        </div>
+
+        <div mat-dialog-content>
+            <mat-form-field appearance="fill" *ngFor="let name of fields | slice:1:-1" color="accent">
+                <mat-label>{{ getConfig(name)?.title }} ({{ getConfig(name)?.units }})</mat-label>
+                <input type="number" matInput [formControlName]="name" />
+            </mat-form-field>
+        </div>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Cancel</button>
+            <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Save</button>
+        </mat-dialog-actions>
+    </div>
+</form>

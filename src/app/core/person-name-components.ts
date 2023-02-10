@@ -24,11 +24,9 @@ export class PersonNameComponents {
     phoneticRepresentation?: string;
 
     constructor( name?: string, @Inject(LOCALE_ID) private locale?: string) {
-        console.debug('PersonNameComponents (...)', name, locale);
         this.personName = name || '';
 
         let components: string[] = this.personName.replace(',', '').split(/\s+/);
-        console.debug('personNameComponents', components);
 
         //
         // If the number of components is 3 or more, it _may_ have a suffix or prefix...
@@ -46,13 +44,11 @@ export class PersonNameComponents {
                 components = components.slice(0, -1);
             }
         }
-        console.debug('personNameComponents', components);
 
         if (components.length > 2) {
             this.givenName = components[0];
             this.familyName = components.slice(-1)[0];
             this.middleName = components.slice(1, -1).join(' ');
-            console.debug('personNameComponents', components.slice(1, -1));
         } else {
             if (components.length > 1) {
                 this.givenName = components[0];
@@ -61,11 +57,13 @@ export class PersonNameComponents {
                 this.givenName = components[0];
             }
         }
-
-        console.debug('personNameComponents', this.namePrefix, this.givenName, this.middleName, this.familyName, this.nameSuffix);
     }
 
-    public formatted(): string {
-        return '';
+    get fullName(): string {
+        return [this.namePrefix, this.givenName, this.middleName, this.familyName, this.nameSuffix].join(' ');
+    }
+
+    public toString(): string {
+        return this.fullName;
     }
 }

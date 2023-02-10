@@ -6,7 +6,7 @@ import { firebaseConfig } from '@core/config/firebase.config';
 
 
 @Component({
-  selector: 'app-root',
+  selector: 'ktb-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

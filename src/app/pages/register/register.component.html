@@ -1,1 +1,24 @@
-<p>register works!</p>
+<div class="container">
+    <div class="row justify-content-between align-items-baseline">
+        <div class="col-auto">
+            <button type="button" class="btn btn-rounded border-0" [disabled]="!prevStep()" (click)="onBack()">
+                <i class="fs-2 bi bi-arrow-left-circle-fill"></i>
+            </button>
+        </div>
+        <div class="col">
+            <div class="stepper">
+                <div class="stepper-item" *ngFor="let step of registerSteps; index as i"
+                    [class.completed]="hasVisited(step.path)" [class.active]="isActive(step.path)">
+                    <h5 class="step-counter">{{ i + 1 }}</h5>
+                    <h4 class="step-name">{{ step.title }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-rounded border-0" [disabled]="!nextStep()" (click)="onNext()">
+                <i class="fs-2 bi bi-arrow-right-circle-fill"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

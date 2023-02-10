@@ -1,0 +1,204 @@
+import java.nio.file.Paths
+
+apply plugin: 'jacoco'
+
+ext {
+    jacocoVersion ="0.8.7"
+    junit5Version = "5.9.0"
+    resteasyVersion = "6.0.0.Final"
+    resteasyMicroProfileVersion = "[1.0.0.Final,)"
+}
+
+jacoco {
+    toolVersion = "${jacocoVersion}"
+}
+
+
+tasks.named('libertyDevc') {
+
+    def jacocoJavaAgent = "/liberty/usr/shared/config/lib/jacocoagent.jar"
+    def jacocoResult = "/liberty/usr/shared/config/lib/test.exec"
+    def jacocoOptions = [
+            "append=true",
+            "inclnolocationclasses=false",
+            "dumponexit=true",
+            "output=file",
+            "jmx=false",
+    ].join(",")
+
+    liberty {
+        server {
+            jvmOptions = [
+                    "-javaagent:${jacocoJavaAgent}=destfile=${jacocoResult},${jacocoOptions}"
+            ]
+        }
+    }
+}
+
+dependencies {
+    // Bill-Of-Materials (BOMs)
+    implementation(platform("org.junit:junit-bom:${junit5Version}"))
+    implementation(platform("org.jboss.resteasy:resteasy-bom:${resteasyVersion}"))
+    implementation(platform("org.jboss.resteasy.microprofile:resteasy-microprofile-test-bom:${resteasyMicroProfileVersion}"))
+
+    // Test Framework (JUnit 5)
+    testImplementation "org.junit.platform:junit-platform-suite"
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+    // JBoss RESTEasy with Jersey (Jakarta EE)
+    testImplementation "org.jboss.resteasy:resteasy-core"
+    testImplementation "org.jboss.resteasy:resteasy-client"
+    testImplementation "org.jboss.resteasy:resteasy-json-binding-provider"
+    testImplementation "org.jboss.resteasy:resteasy-json-p-provider"
+    testImplementation "org.jboss.resteasy.microprofile:microprofile-rest-client"
+    testImplementation "io.smallrye.config:smallrye-config:2.11.1"
+    //testRuntimeOnly "org.jboss.weld:weld-junit5:[4.0.0-Final,)"
+    //testRuntimeOnly "org.glassfish.jersey.core:jersey-client:3.0.4"
+    //testRuntimeOnly "org.glassfish.jersey.media:jersey-media-json-processing:3.0.4"
+    //testRuntimeOnly "org.glassfish.jersey.media:jersey-media-moxy:3.0.4"
+
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = 0.0
+            }
+        }
+        rule {
+            limit {
+                counter = "METHOD"
+                value = "COVEREDRATIO"
+                minimum = 0.0
+            }
+        }
+        rule {
+            limit {
+                counter = "CLASS"
+                value = "COVEREDRATIO"
+                minimum = 0.0
+            }
+        }
+        rule {
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = 0.0
+            }
+        }
+        rule {
+            limit {
+                counter = "INSTRUCTION"
+                value = "COVEREDRATIO"
+                minimum = 0.0
+            }
+        }
+    }
+}
+
+//
+// Extract the JaCoCo agent (jacocoagent.jar) to ${buildDir}/jacoco
+//
+tasks.register("extractJaCoCoAgent", Copy) {
+    from(zipTree(configurations.jacocoAgent.asPath)) {
+        include "jacocoagent.jar"
+    }
+    into layout.buildDirectory.dir("jacoco")
+}
+installFeature.finalizedBy extractJaCoCoAgent
+
+tasks.register("dockerComposeBuild", Exec) {
+    ext.jacocoJavaAgent = "/liberty/usr/shared/config/lib/jacocoagent.jar"
+    ext.jacocoResult = "/liberty/usr/shared/config/lib/test.exec"
+
+    commandLine 'docker-compose', 'up', '-d', '--build'
+}
+
+tasks.register("dockerComposeDown", Exec) {
+    exec {
+        commandLine 'docker-compose', 'cp', 'ktbtracker-api:/liberty/usr/shared/config/lib/test.exec', layout.buildDirectory.dir("jacoco")
+    }
+    commandLine 'docker-compose', 'down'
+}
+
+
+tasks.withType(Test) {
+    dependsOn 'extractJaCoCoAgent'
+
+    systemProperty "java.util.logging.config.file", "src/test/resources/logging.properties"
+
+    environment 'HTTP_PORT', "${http_port}"
+    environment 'HTTPS_PORT', "${https_port}"
+    environment 'SEC_SSO_REDIRECTTORPHOSTANDPORT', "http://localhost:${http_port}"
+
+    environment 'KINGTIGER_KTBTRACKER_SERVICE_MP_REST_URL', "http://localhost:${http_port}/api"
+
+    testLogging {
+        exceptionFormat "full"
+        events "failed", "skipped", "standardError"
+        info.events "started", "passed", "failed", "skipped", "standardOut", "standardError"
+        displayGranularity = 1
+
+        afterSuite { desc, result ->
+            // Match the outermost suite
+            if (!desc.parent) {
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successful, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+                println "\n" + "-" * output.length()
+                println output
+                println "-" * output.length()
+                if (result.resultType.equals(TestResult.ResultType.SUCCESS)) {
+                    println "Test report at: " + Paths.get(reports.html.getEntryPoint().getPath()).toUri()
+                }
+                println "Code Coverage report at: " + Paths.get(layout.buildDirectory.file("reports/jacoco/test/html/index.html").get().asFile.toURI()).toUri()
+            }
+        }
+
+        maxParallelForks = 1
+        ignoreFailures = true
+    }
+
+    //
+
+    def jacocoJavaAgent = layout.buildDirectory.file("jacoco/jacocoagent.jar").get().asFile
+    def jacocoResult = layout.buildDirectory.file("jacoco/test.exec").get().asFile
+    def jacocoOptions = [
+            "append=true",
+            "inclnolocationclasses=false",
+            "dumponexit=true",
+            "output=file",
+            "jmx=false",
+    ].join(",")
+
+    if (gradle.startParameter.taskNames.contains('libertyDevc')) {
+        jacocoJavaAgent = "/devmode/build/jacoco/jacocoagent.jar"
+        jacocoResult = "/devmode/build/jacoco/test.exec"
+    }
+
+    liberty {
+        server {
+            jvmOptions = [
+                    "-Dfile.encoding=UTF-8",
+                    "-Dmp.config.profile=test",
+                    "-javaagent:${jacocoJavaAgent}=destfile=${jacocoResult},${jacocoOptions}"
+            ]
+        }
+    }
+}
+
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification

@@ -10,7 +10,6 @@
                 <h4> {{ currentCycle.cycleStart | localDate:'fullDate' }} &mdash; {{ currentCycle.cycleEnd |
                     localDate:'fullDate' }}
                 </h4>
-                <p>{{ cycleDays }} {{ cycleDay }} {{ cycleWeeks }} {{ currentWeek }} {{ currentDate }}</p>
             </div>
         </div>
         <div class="row container">
@@ -23,8 +22,9 @@
                                 <div class="d-flex">
                                     <div>
                                         <button type="button" class="btn btn-rounded border-0"
-                                            [disabled]="(currentWeek + 1) <= 1">
-                                            <a [routerLink]="currentRoute" [queryParams]="{week: (currentWeek + 1) - 1}"
+                                            [disabled]="currentCycle.weekOf(currentWeek) <= 0">
+                                            <a [routerLink]="currentRoute"
+                                                [queryParams]="{week: (currentCycle.weekOf(currentWeek) + 1) - 1}"
                                                 queryParamsHandling="merge">
                                                 <i class="text-white fs-2 bi bi-arrow-left-circle-fill"></i>
                                             </a>
@@ -34,13 +34,14 @@
                                         <h2 class="text-center">
                                             <app-activity-chart size="2rem" [percent]="weekProgress()">
                                             </app-activity-chart>
-                                            Week {{ currentWeek + 1 }}
+                                            Week {{ currentCycle.weekOf(currentWeek) + 1 }}
                                         </h2>
                                     </div>
                                     <div>
                                         <button type="button" class="btn btn-rounded border-0"
-                                            [disabled]="(currentWeek + 1) >= cycleWeeks">
-                                            <a [routerLink]="currentRoute" [queryParams]="{week: (currentWeek + 1) + 1}"
+                                            [disabled]="(currentCycle.weekOf(currentWeek) + 1) >= currentCycle.cycleWeeks">
+                                            <a [routerLink]="currentRoute"
+                                                [queryParams]="{week: (currentCycle.weekOf(currentWeek) + 1) + 1}"
                                                 queryParamsHandling="merge">
                                                 <i class="text-white fs-2 bi bi-arrow-right-circle-fill"></i>
                                             </a>
@@ -51,16 +52,18 @@
                         </tr>
                         <tr class="table-dark">
                             <th class="text-center">
-                                {{ weekStarts | localDate:'fullDate' }} &mdash; {{ weekEnds | localDate:'fullDate' }}
+                                {{ currentWeek.starts | localDate:'fullDate' }} &mdash; {{ currentWeek.ends |
+                                localDate:'fullDate' }}
                             </th>
                         </tr>
                         <tr class="table-dark">
                             <th class="text-center">
-                                <button type="button" class="btn btn-link" *ngFor="let w of range(cycleWeeks)">
+                                <button type="button" class="btn btn-link"
+                                    *ngFor="let w of range(currentCycle.cycleWeeks)">
                                     <a [routerLink]="currentRoute" [queryParams]="{week: w + 1}"
                                         queryParamsHandling="merge">
                                         <i class="bi bi-circle-fill"
-                                            [ngStyle]="{color: weekColor(w), opacity: w === currentWeek ? '1.0' : '0.5'}"></i>
+                                            [ngStyle]="{color: weekColor(w), opacity: w === currentCycle.weekOf(currentWeek) ? '1.0' : '0.5'}"></i>
                                     </a>
                                 </button>
                             </th>
@@ -82,25 +85,25 @@
                                                             <app-activity-chart size="1.5rem"
                                                                 [percent]="weeklyProgress(weeklyA, 'classSaturday')">
                                                             </app-activity-chart>
-                                                            {{ config('classSaturday')?.title }}
+                                                            {{ getConfig('classSaturday')?.title }}
                                                         </th>
                                                         <th>
                                                             <app-activity-chart size="1.5rem"
                                                                 [percent]="weeklyProgress(weeklyA, 'classWeekday')">
                                                             </app-activity-chart>
-                                                            {{ config('classWeekday')?.title }}
+                                                            {{ getConfig('classWeekday')?.title }}
                                                         </th>
                                                         <th>
                                                             <app-activity-chart size="1.5rem"
                                                                 [percent]="weeklyProgress(weeklyA, 'classPMAA')">
                                                             </app-activity-chart>
-                                                            {{ config('classPMAA')?.title }}
+                                                            {{ getConfig('classPMAA')?.title }}
                                                         </th>
                                                         <th>
                                                             <app-activity-chart size="1.5rem"
                                                                 [percent]="weeklyProgress(weeklyA, 'classSparring')">
                                                             </app-activity-chart>
-                                                            {{ config('classSparring')?.title }}
+                                                            {{ getConfig('classSparring')?.title }}
                                                         </th>
                                                         <th></th>
                                                     </tr>
@@ -122,7 +125,8 @@
                                                                             [ngClass]="weeklyAForm.get('classSaturday')?.errors ? 'is-invalid' : ''"
                                                                             formControlName="classSaturday" />
                                                                         <div class="invalid-feedback">
-                                                                            Enter {{ config('classSaturday')?.units }}
+                                                                            Enter {{ getConfig('classSaturday')?.units
+                                                                            }}
                                                                         </div>
                                                                     </div>
                                                                 </td>
@@ -133,7 +137,7 @@
                                                                             [ngClass]="weeklyAForm.get('classWeekday')?.errors ? 'is-invalid' : ''"
                                                                             formControlName="classWeekday" />
                                                                         <div class="invalid-feedback">
-                                                                            Enter {{ config('classWeekday')?.units }}
+                                                                            Enter {{ getConfig('classWeekday')?.units }}
                                                                         </div>
                                                                     </div>
                                                                 </td>
@@ -144,7 +148,7 @@
                                                                             [ngClass]="weeklyAForm.get('classPMAA')?.errors ? 'is-invalid' : ''"
                                                                             formControlName="classPMAA" />
                                                                         <div class="invalid-feedback">
-                                                                            Enter {{ config('classPMAA')?.units }}
+                                                                            Enter {{ getConfig('classPMAA')?.units }}
                                                                         </div>
                                                                     </div>
                                                                 </td>
@@ -155,7 +159,8 @@
                                                                             [ngClass]="weeklyAForm.get('classSparring')?.errors ? 'is-invalid' : ''"
                                                                             formControlName="classSparring" />
                                                                         <div class="invalid-feedback">
-                                                                            Enter {{ config('classSparring')?.units }}
+                                                                            Enter {{ getConfig('classSparring')?.units
+                                                                            }}
                                                                         </div>
                                                                     </div>
                                                                 </td>

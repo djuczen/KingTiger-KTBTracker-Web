@@ -1,13 +1,27 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+.gradle
+/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties
 
 # Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
 
 # Node
-/node_modules
+/node_modules/
 npm-debug.log
 yarn-error.log
 

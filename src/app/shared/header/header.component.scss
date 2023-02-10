@@ -1,0 +1,94 @@
+@use '@angular/material' as mat;
+@import '../../../theme.scss';
+
+header.ktb-main-header {
+    grid-area: main-header;
+
+    .ktb-header {
+        padding: 0 5rem;
+
+        .ktb-header-logo {
+            max-height: 60px;
+        }
+        
+        .ktb-header-spacer {
+            flex: 1 1 auto;
+        }
+
+        .ktb-header-nav {
+            a {
+                border-radius: 0;
+                border-bottom: 2px solid transparent;
+                transition: all .2s linear;
+            }
+
+            a.active {
+                font-weight: 600;
+                border-bottom: 2px solid mat.get-color-from-palette($ktb-accent, 500);
+            }
+            
+        }
+    }
+}
+
+
+
+
+@media (prefers-color-scheme: light) {
+}
+
+/*
+.ktb-header {
+    justify-content: center;
+    background-color: #393939;
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .ktb-main-nav {
+        display: flex;
+        height: 100%;
+
+        .ktb-nav-left {
+            color: #fff;
+            padding-left: 1rem;
+        }
+
+        .ktb-center {
+            display: flex;
+            align-items: center;
+
+            .mat-button {
+                color: #fff;
+                border-radius: 0;
+                font-weight: 300;
+                display: block;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+            }
+
+            .mat-button.ktb-active {
+                color: #fff;
+                font-weight: 500;
+            }
+        }
+
+        .ktb-nav-right {
+            display: flex;
+            color: #fff;
+            height: 100%;
+            align-items: center;
+            justify-content: right;
+            padding-right: 2rem;
+        }
+
+        .ktb-nav-right {
+            color: #fff;
+        }
+    }
+}
+*/
